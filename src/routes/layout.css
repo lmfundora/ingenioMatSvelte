@@ -1,0 +1,538 @@
+@import "tailwindcss";
+
+/* Agregamos Fraunces, Manrope, Italianno e Instrument Sans en el mismo llamado */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Italianno&family=Manrope:wght@400;500;600;700;800&display=swap");
+@plugin '@tailwindcss/typography';
+
+/* 3. Definición de fuentes y variables de tema */
+@theme {
+    --font-italianno: "Italianno", cursive;
+    --font-instrument: "Instrument Sans", sans-serif;
+}
+
+:root {
+    --sea-ink: #173a40;
+    --sea-ink-soft: #416166;
+    --lagoon: #4fb8b2;
+    --lagoon-deep: #328f97;
+    --palm: #2f6a4a;
+    --sand: #e7f0e8;
+    --foam: #f3faf5;
+    --surface: rgba(255, 255, 255, 0.74);
+    --surface-strong: rgba(255, 255, 255, 0.9);
+    --line: rgba(23, 58, 64, 0.14);
+    --inset-glint: rgba(255, 255, 255, 0.82);
+    --kicker: rgba(47, 106, 74, 0.9);
+    --bg-base: #fff6ef;
+    /* <-- Cambiado de #e7f3ec */
+    --background: oklch(98% 0.016 73.684);
+    /* <-- Color crema en oklch */
+    --header-bg: rgba(251, 255, 248, 0.84);
+    --chip-bg: rgba(255, 255, 255, 0.8);
+    --chip-line: rgba(47, 106, 74, 0.18);
+    --link-bg-hover: rgba(255, 255, 255, 0.9);
+    --hero-a: rgba(79, 184, 178, 0.36);
+    --hero-b: rgba(47, 106, 74, 0.2);
+    --text-dark: #1e1e1e;
+
+    --background: oklch(98% 0.016 73.684);
+    --foreground: oklch(0.147 0.004 49.3);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.147 0.004 49.3);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.147 0.004 49.3);
+    --primary: oklch(0.214 0.009 43.1);
+    --primary-foreground: oklch(0.986 0.002 67.8);
+    --secondary: oklch(0.96 0.002 17.2);
+    --secondary-foreground: oklch(0.214 0.009 43.1);
+    --muted: oklch(0.96 0.002 17.2);
+    --muted-foreground: oklch(0.547 0.021 43.1);
+    --accent: oklch(0.96 0.002 17.2);
+    --accent-foreground: oklch(0.214 0.009 43.1);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0.005 34.3);
+    --input: oklch(0.922 0.005 34.3);
+    --ring: oklch(0.714 0.014 41.2);
+    --chart-1: oklch(0.868 0.007 39.5);
+    --chart-2: oklch(0.547 0.021 43.1);
+    --chart-3: oklch(0.438 0.017 39.3);
+    --chart-4: oklch(0.367 0.016 35.7);
+    --chart-5: oklch(0.268 0.011 36.5);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.986 0.002 67.8);
+    --sidebar-foreground: oklch(0.147 0.004 49.3);
+    --sidebar-primary: oklch(0.214 0.009 43.1);
+    --sidebar-primary-foreground: oklch(0.986 0.002 67.8);
+    --sidebar-accent: oklch(0.96 0.002 17.2);
+    --sidebar-accent-foreground: oklch(0.214 0.009 43.1);
+    --sidebar-border: oklch(0.922 0.005 34.3);
+    --sidebar-ring: oklch(0.714 0.014 41.2);
+
+    /* Variables de fuente para shadcn/ui */
+    --font-sans: "Instrument Sans", sans-serif;
+    --font-heading: "Instrument Sans", sans-serif;
+}
+
+.dark {
+    --sea-ink: #d7ece8;
+    --sea-ink-soft: #afcdc8;
+    --lagoon: #60d7cf;
+    --lagoon-deep: #8de5db;
+    --palm: #6ec89a;
+    --sand: #0f1a1e;
+    --foam: #101d22;
+    --surface: rgba(16, 30, 34, 0.8);
+    --surface-strong: rgba(15, 27, 31, 0.92);
+    --line: rgba(141, 229, 219, 0.18);
+    --inset-glint: rgba(194, 247, 238, 0.14);
+    --kicker: #b8efe5;
+    --bg-base: #0a1418;
+    --header-bg: rgba(10, 20, 24, 0.8);
+    --chip-bg: rgba(13, 28, 32, 0.9);
+    --chip-line: rgba(141, 229, 219, 0.24);
+    --link-bg-hover: rgba(24, 44, 49, 0.8);
+    --hero-a: rgba(96, 215, 207, 0.18);
+    --hero-b: rgba(110, 200, 154, 0.12);
+
+    --background: oklch(0.147 0.004 49.3);
+    --foreground: oklch(0.986 0.002 67.8);
+    --card: oklch(0.214 0.009 43.1);
+    --card-foreground: oklch(0.986 0.002 67.8);
+    --popover: oklch(0.214 0.009 43.1);
+    --popover-foreground: oklch(0.986 0.002 67.8);
+    --primary: oklch(0.922 0.005 34.3);
+    --primary-foreground: oklch(0.214 0.009 43.1);
+    --secondary: oklch(0.268 0.011 36.5);
+    --secondary-foreground: oklch(0.986 0.002 67.8);
+    --muted: oklch(0.268 0.011 36.5);
+    --muted-foreground: oklch(0.714 0.014 41.2);
+    --accent: oklch(0.268 0.011 36.5);
+    --accent-foreground: oklch(0.986 0.002 67.8);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.547 0.021 43.1);
+    --chart-1: oklch(0.868 0.007 39.5);
+    --chart-2: oklch(0.547 0.021 43.1);
+    --chart-3: oklch(0.438 0.017 39.3);
+    --chart-4: oklch(0.367 0.016 35.7);
+    --chart-5: oklch(0.268 0.011 36.5);
+    --sidebar: oklch(0.214 0.009 43.1);
+    --sidebar-foreground: oklch(0.986 0.002 67.8);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.986 0.002 67.8);
+    --sidebar-accent: oklch(0.268 0.011 36.5);
+    --sidebar-accent-foreground: oklch(0.986 0.002 67.8);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.547 0.021 43.1);
+
+    /* Variables de fuente para shadcn/ui en modo dark */
+    --font-sans: "Instrument Sans", sans-serif;
+    --font-heading: "Instrument Sans", sans-serif;
+}
+
+.vinetta {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+
+    background: radial-gradient(
+            76.39% 51.99% at 76.39% 48.01%,
+            rgba(102, 102, 102, 0) 1.87%,
+            rgba(21, 21, 21, 0.45) 67.31%,
+            rgba(0, 0, 0, 0.6) 86.54%,
+            rgba(0, 0, 0, 0.8) 99.52%
+        )
+        /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
+}
+
+/* Scroll-driven animations using CSS transitions */
+.hero-title {
+    font-size: 4rem;
+    color: white;
+    top: 40%;
+    left: 15%;
+    transition: all 0.7s ease-out;
+}
+
+@media (min-width: 768px) {
+    .hero-title {
+        font-size: 8rem;
+        color: white;
+        top: 40%;
+        left: 15%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-title {
+        font-size: 9rem;
+        color: white;
+        top: 40%;
+        left: 15%;
+    }
+}
+
+.hero-button {
+    top: 52%;
+    left: 35%;
+    transform: translateX(-50%);
+    transition: all 0.7s ease-out;
+}
+
+@media (min-width: 768px) {
+    .hero-button {
+        top: 65%;
+        left: 25%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-button {
+        top: 65%;
+        left: 21%;
+        transform: translateX(-50%);
+    }
+}
+
+.white-panel {
+    transform: translateY(100%);
+    transition: transform 0.7s ease-out;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .white-panel {
+        width: 75%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .white-panel {
+        width: 50%;
+    }
+}
+
+/* Scrolled state */
+body.scrolled .hero-title {
+    font-size: 4rem;
+    color: var(--text-dark);
+    top: 25%;
+    left: 24%;
+}
+
+@media (min-width: 768px) {
+    body.scrolled .hero-title {
+        font-size: 5rem;
+        color: var(--text-dark);
+        top: 20%;
+        left: 15%;
+    }
+}
+
+@media (min-width: 1024px) {
+    body.scrolled .hero-title {
+        font-size: 5rem;
+        color: var(--text-dark);
+        top: 20%;
+        left: 15%;
+    }
+}
+
+body.scrolled .hero-button button {
+    background-color: var(--text-dark);
+    color: white;
+    border-color: var(--text-dark);
+}
+
+body.scrolled .hero-button {
+    top: 60%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+@media (min-width: 768px) {
+    body.scrolled .hero-button {
+        top: 62%;
+        left: 32%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (min-width: 1024px) {
+    body.scrolled .hero-button {
+        top: 62%;
+        left: 24.5%;
+        transform: translateX(-50%);
+    }
+}
+
+body.scrolled .white-panel {
+    transform: translateY(0);
+}
+
+@keyframes draw {
+    0% {
+        stroke-dashoffset: 12000;
+        fill-opacity: 0;
+    }
+
+    50% {
+        stroke-dashoffset: 0;
+        fill-opacity: 0.15;
+    }
+
+    100% {
+        stroke-dashoffset: 12000;
+        fill-opacity: 0;
+    }
+}
+
+.animate-draw {
+    stroke-dasharray: 12000;
+    stroke-dashoffset: 12000;
+    animation: draw 30s linear infinite;
+}
+
+/*.vignette-container {
+    position: relative;
+    overflow: visible;
+    border-radius: 12px;
+}*/
+
+/* Shadow 4 Inner Shadow — applied directly ON TOP of the image */
+/*.vignette-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+    box-shadow:
+        inset -15px -15px 33px rgba(13, 39, 80, 0.8),
+        inset 16px 16px 38px rgba(255, 255, 255, 0.9);
+}*/
+
+/*.vignette-blur {
+    position: absolute;
+    width: calc(100% + 24px);
+    height: calc(100% + 24px);
+    object-fit: cover;
+    filter: blur(20px) brightness(1.15) saturate(1.3);
+    opacity: 0.35;
+    z-index: -1;
+    border-radius: 18px;
+}*/
+
+.vignette-container img:not(.vignette-blur) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+    box-shadow: 16px 16px 38px rgba(250, 109, 2, 0.2);
+}
+
+.vinetta {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+
+    background: radial-gradient(
+            76.39% 51.99% at 76.39% 48.01%,
+            rgba(102, 102, 102, 0) 1.87%,
+            rgba(21, 21, 21, 0.45) 67.31%,
+            rgba(0, 0, 0, 0.6) 86.54%,
+            rgba(0, 0, 0, 0.8) 99.52%
+        )
+        /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
+}
+
+/* Scroll-driven animations using CSS transitions */
+.hero-title {
+    font-size: 4rem;
+    color: white;
+    top: 40%;
+    left: 15%;
+    transition: all 0.7s ease-out;
+}
+
+@media (min-width: 768px) {
+    .hero-title {
+        font-size: 8rem;
+        color: white;
+        top: 40%;
+        left: 15%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-title {
+        font-size: 9rem;
+        color: white;
+        top: 40%;
+        left: 15%;
+    }
+}
+
+.hero-button {
+    top: 52%;
+    left: 35%;
+    transform: translateX(-50%);
+    transition: all 0.7s ease-out;
+}
+
+@media (min-width: 768px) {
+    .hero-button {
+        top: 65%;
+        left: 25%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-button {
+        top: 65%;
+        left: 21%;
+        transform: translateX(-50%);
+    }
+}
+
+.white-panel {
+    transform: translateY(100%);
+    transition: transform 0.7s ease-out;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .white-panel {
+        width: 75%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .white-panel {
+        width: 50%;
+    }
+}
+
+/* Scrolled state */
+body.scrolled .hero-title {
+    font-size: 4rem;
+    color: var(--text-dark);
+    top: 25%;
+    left: 24%;
+}
+
+@media (min-width: 768px) {
+    body.scrolled .hero-title {
+        font-size: 5rem;
+        color: var(--text-dark);
+        top: 20%;
+        left: 15%;
+    }
+}
+
+@media (min-width: 1024px) {
+    body.scrolled .hero-title {
+        font-size: 5rem;
+        color: var(--text-dark);
+        top: 20%;
+        left: 15%;
+    }
+}
+
+body.scrolled .hero-button button {
+    background-color: var(--text-dark);
+    color: white;
+    border-color: var(--text-dark);
+}
+
+body.scrolled .hero-button {
+    top: 60%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+@media (min-width: 768px) {
+    body.scrolled .hero-button {
+        top: 62%;
+        left: 32%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (min-width: 1024px) {
+    body.scrolled .hero-button {
+        top: 62%;
+        left: 24.5%;
+        transform: translateX(-50%);
+    }
+}
+
+body.scrolled .white-panel {
+    transform: translateY(0);
+}
+
+@keyframes draw {
+    0% {
+        stroke-dashoffset: 12000;
+        fill-opacity: 0;
+    }
+
+    50% {
+        stroke-dashoffset: 0;
+        fill-opacity: 0.15;
+    }
+
+    100% {
+        stroke-dashoffset: 12000;
+        fill-opacity: 0;
+    }
+}
+
+.animate-draw {
+    stroke-dasharray: 12000;
+    stroke-dashoffset: 12000;
+    animation: draw 30s linear infinite;
+}
+
+/*.vignette-container {
+    position: relative;
+    overflow: visible;
+    border-radius: 12px;
+}*/
+
+/* Shadow 4 Inner Shadow — applied directly ON TOP of the image */
+/*.vignette-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+    box-shadow:
+        inset -15px -15px 33px rgba(13, 39, 80, 0.8),
+        inset 16px 16px 38px rgba(255, 255, 255, 0.9);
+}*/
+
+/*.vignette-blur {
+    position: absolute;
+    width: calc(100% + 24px);
+    height: calc(100% + 24px);
+    object-fit: cover;
+    filter: blur(20px) brightness(1.15) saturate(1.3);
+    opacity: 0.35;
+    z-index: -1;
+    border-radius: 18px;
+}*/
+
+.vignette-container img:not(.vignette-blur) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+    box-shadow: 16px 16px 38px rgba(250, 109, 2, 0.2);
+}

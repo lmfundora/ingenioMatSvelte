@@ -9,11 +9,12 @@ export default defineSchema({
   sections: defineTable({
     name: v.string(),
     description: v.string(),
-    imageUrl: v.optional(v.string()),
+    imageUrl: v.string(),
     order: v.number(),
     slug: v.optional(v.string()),
-    showOnLanding: v.optional(v.boolean()),
-  }).index("by_slug", ["slug"]).index("by_order", ["order"]),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_order", ["order"]),
   categories: defineTable({
     name: v.string(),
   }),
@@ -28,5 +29,7 @@ export default defineSchema({
     preparation: v.optional(v.string()),
     ingredients: v.optional(v.array(v.string())),
     slug: v.optional(v.string()),
-  }).index("by_section", ["sectionId"]).index("by_slug", ["slug"]),
+  })
+    .index("by_section", ["sectionId"])
+    .index("by_slug", ["slug"]),
 });

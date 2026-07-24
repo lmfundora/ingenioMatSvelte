@@ -4,7 +4,10 @@ import { mutation, query } from "./_generated/server";
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    const sections = await ctx.db.query("sections").withIndex("by_order").collect();
+    const sections = await ctx.db
+      .query("sections")
+      .withIndex("by_order")
+      .collect();
     return await Promise.all(
       sections.map(async (section) => {
         if (!section.imageUrl) return section;
@@ -21,7 +24,7 @@ export const list = query({
           // Si falla, devolver la sección sin imagen
           return { ...section, imageUrl: undefined };
         }
-      })
+      }),
     );
   },
 });
@@ -61,10 +64,9 @@ export const create = mutation({
   args: {
     name: v.string(),
     description: v.string(),
-    imageUrl: v.optional(v.string()),
+    imageUrl: v.string(),
     order: v.number(),
     slug: v.string(),
-    showOnLanding: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -81,7 +83,6 @@ export const create = mutation({
       imageUrl: args.imageUrl,
       order: args.order,
       slug: args.slug,
-      showOnLanding: args.showOnLanding ?? true,
     };
     const id = await ctx.db.insert("sections", newSection);
     return { id };
@@ -96,7 +97,6 @@ export const update = mutation({
     imageUrl: v.optional(v.string()),
     order: v.optional(v.number()),
     slug: v.optional(v.string()),
-    showOnLanding: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;

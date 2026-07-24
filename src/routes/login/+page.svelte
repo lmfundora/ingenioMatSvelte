@@ -32,7 +32,7 @@
                         );
                     } else {
                         toast.success("Sesión iniciada correctamente");
-                        goto("/admin");
+                        await goto("/admin");
                     }
                 } catch (err) {
                     toast.error("Ocurrió un error inesperado");

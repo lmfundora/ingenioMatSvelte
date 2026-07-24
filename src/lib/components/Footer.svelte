@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Separator from "$lib/ui/Separator.svelte";
+    import { Separator } from "$lib/components/ui/separator";
 </script>
 
 <footer class="text-text-dark px-6 md:px-12 lg:px-25 mt-20">

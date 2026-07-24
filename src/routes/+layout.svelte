@@ -6,7 +6,7 @@
 
     import { createSvelteAuthClient } from "@mmailaender/convex-better-auth-svelte/svelte";
     import { authClient } from "$lib/auth-client";
-    import Toaster from "$lib/ui/Toaster.svelte";
+    import { Toaster } from "$lib/components/ui/sonner";
 
     createSvelteAuthClient({ authClient });
     setupConvex(PUBLIC_CONVEX_URL);
@@ -17,4 +17,4 @@
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 {@render children()}
 <!-- Toaster global -->
-<Toaster />
+<Toaster position="top-right" richColors />

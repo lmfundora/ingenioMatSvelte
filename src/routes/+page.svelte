@@ -1,6 +1,6 @@
 <script>
     import SvgDraw from "$lib/components/SvgDraw.svelte";
-    import Button from "$lib/ui/Button.svelte";
+    import { Button } from "$lib/components/ui/button/index.js";
     import Footer from "$lib/components/Footer.svelte";
     import Seo from "$lib/components/Seo.svelte";
     import ArrowRight from "@lucide/svelte/icons/arrow-right";
@@ -50,8 +50,7 @@
         <!-- CTA Button -->
         <a href="/carta" class="hero-button absolute z-35">
             <Button
-                variant="outline"
-                class="gap-2 font-sans tracking-widest text-white transition-colors duration-300 hover:bg-accent"
+                class="gap-2 font-sans tracking-widest transition-colors duration-300"
             >
                 Ver carta
                 <ArrowRight class="h-4 w-4" />

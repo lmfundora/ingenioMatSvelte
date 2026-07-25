@@ -3,24 +3,20 @@
     import { Button } from "$lib/components/ui/button/index.js";
     import { Badge } from "$lib/components/ui/badge/index.js";
     import * as Card from "$lib/components/ui/card/index.js";
+    import type { Doc, Id } from "$convex/_generated/dataModel";
 
-    export interface Product {
-        _id: string;
-        name: string;
-        description?: string;
-        price: number;
-        imageUrl?: string;
-        sectionId: string;
-        categoryId?: string | null;
-        allergens?: string[];
-    }
+    // Usamos directamente el tipo del documento generado por Convex
+    export type Product = Doc<"products">;
 
     interface Props {
         product: Product;
-        getSectionName: (sectionId: string) => string;
-        getCategoryName: (categoryId: string | null) => string;
+        getSectionName: (sectionSlug: string) => string;
+        // Permite string, Id<"categories"> o null/undefined
+        getCategoryName: (
+            categoryId: Id<"categories"> | string | null | undefined,
+        ) => string;
         onEdit: (product: Product) => void;
-        onDelete: (id: string) => void;
+        onDelete: (id: Id<"products">) => void;
     }
 
     let { product, getSectionName, getCategoryName, onEdit, onDelete }: Props =
@@ -36,7 +32,7 @@
 <Card.Root
     class="group relative overflow-hidden flex flex-col p-0 transition-all duration-200 hover:shadow-md hover:border-border/80"
 >
-    <!-- Imagen del Producto (Totalmente al ras del borde superior) -->
+    <!-- Imagen del Producto -->
     {#if product.imageUrl}
         <div
             class="relative w-full h-32 shrink-0 overflow-hidden bg-muted m-0 p-0"
@@ -52,7 +48,7 @@
         </div>
     {/if}
 
-    <!-- Contenido con Padding interno uniforme -->
+    <!-- Contenido -->
     <div class="p-3.5 flex-1 flex flex-col justify-between space-y-2.5">
         <!-- Bloque Superior: Nombre + Precio -->
         <div class="space-y-1">
@@ -76,7 +72,8 @@
                     variant="secondary"
                     class="font-normal text-[10px] px-1.5 py-0 h-4"
                 >
-                    {getSectionName(product.sectionId)}
+                    <!-- Ajustado a product.sectionSlug -->
+                    {getSectionName(product.sectionSlug)}
                 </Badge>
                 {#if product.categoryId}
                     <Badge

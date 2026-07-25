@@ -2,6 +2,8 @@
     import { useQuery, useMutation } from "convex-svelte";
     import { api } from "$convex/_generated/api";
     import type { Doc, Id } from "$convex/_generated/dataModel";
+    import type { ProductSchema } from "$lib/schemas/product";
+    import type { InferOutput } from "valibot";
     import { Plus } from "@lucide/svelte";
     import { toast } from "$lib/toast";
 
@@ -12,10 +14,11 @@
     import { Button } from "$lib/components/ui/button";
     import * as Dialog from "$lib/components/ui/dialog";
 
-    // Tipos extraídos del modelo de Convex
+    // Tipos extraídos del modelo de Convex y Schemas
     type Product = Doc<"products">;
     type Section = Doc<"sections">;
     type Category = Doc<"categories">;
+    type ProductFormData = InferOutput<ProductSchema>;
 
     // --- Estado Local (Svelte 5 Runes) ---
     let showForm = $state(false);
@@ -47,41 +50,38 @@
         return section?.name || "Sin sección";
     }
 
-    function getCategoryName(categoryId: string | null) {
+    function getCategoryName(
+        categoryId: Id<"categories"> | string | null | undefined,
+    ): string {
         if (!categoryId) return "Sin categoría";
-        const category = (categoriesQuery.data as Category[] | undefined)?.find(
+        const category = categoriesQuery.data?.find(
             (c) => c._id === categoryId,
         );
-        return category?.name || "Sin categoría";
+        return category ? category.name : "Desconocida";
     }
 
     // --- Productos Filtrados (Derivado Reactivo) ---
     let filteredProducts = $derived.by(() => {
         const list = (productsQuery.data as Product[] | undefined) || [];
         return list.filter((product) => {
-            // Filtro por nombre
             if (
                 searchQuery &&
                 !product.name.toLowerCase().includes(searchQuery.toLowerCase())
             ) {
                 return false;
             }
-            // Filtro por sección
             if (filterSection && product.slug !== filterSection) {
                 return false;
             }
-            // Filtro por categoría
             if (filterCategory && product.categoryId !== filterCategory) {
                 return false;
             }
-            // Filtro por precio mínimo
             if (
                 filterPriceMin !== undefined &&
                 product.price < filterPriceMin
             ) {
                 return false;
             }
-            // Filtro por precio máximo
             if (
                 filterPriceMax !== undefined &&
                 product.price > filterPriceMax
@@ -130,17 +130,27 @@
         editingProduct = null;
     }
 
-    async function handleSave(data: Doc<"products">) {
+    // Firma ajustada para recibir los datos del formulario (ProductFormData)
+    async function handleSave(data: ProductFormData) {
         try {
+            const payload = {
+                ...data,
+                categoryId: data.categoryId as Id<"categories">,
+            };
+
             if (editingProduct) {
-                await updateProduct({ id: editingProduct._id, ...data });
+                await updateProduct({
+                    id: editingProduct._id,
+                    ...payload,
+                });
                 toast.success("Producto actualizado");
             } else {
-                await createProduct(data);
+                await createProduct(payload);
                 toast.success("Producto creado");
             }
             handleFormClose();
         } catch (error) {
+            console.error("Error al guardar producto:", error);
             toast.error("Error al guardar producto");
         }
     }

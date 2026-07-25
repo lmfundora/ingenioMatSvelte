@@ -130,7 +130,7 @@ export const update = mutation({
     imageUrl: v.optional(v.string()),
     price: v.optional(v.number()),
     categoryId: v.optional(v.id("categories")),
-    sectionId: v.optional(v.id("sections")),
+    sectionSlug: v.optional(v.id("sections")),
     allergens: v.optional(v.array(v.string())),
     preparation: v.optional(v.string()),
     ingredients: v.optional(v.array(v.string())),

@@ -21,7 +21,7 @@ export const list = query({
           // Si falla, devolver el producto sin imagen
           return { ...product, imageUrl: undefined };
         }
-      })
+      }),
     );
   },
 });
@@ -48,7 +48,7 @@ export const listBySection = query({
         } catch {
           return { ...product, imageUrl: undefined };
         }
-      })
+      }),
     );
   },
 });
@@ -107,7 +107,7 @@ export const create = mutation({
     imageUrl: v.optional(v.string()),
     price: v.number(),
     categoryId: v.optional(v.id("categories")),
-    sectionId: v.id("sections"),
+    sectionSlug: v.string(),
     allergens: v.optional(v.array(v.string())),
     preparation: v.optional(v.string()),
     ingredients: v.optional(v.array(v.string())),
@@ -128,7 +128,7 @@ export const create = mutation({
       imageUrl: args.imageUrl,
       price: args.price,
       categoryId: args.categoryId,
-      sectionId: args.sectionId,
+      sectionSlug: args.sectionSlug,
       allergens: args.allergens,
       preparation: args.preparation,
       ingredients: args.ingredients,
@@ -147,7 +147,7 @@ export const update = mutation({
     imageUrl: v.optional(v.string()),
     price: v.optional(v.number()),
     categoryId: v.optional(v.id("categories")),
-    sectionId: v.optional(v.id("sections")),
+    sectionSlug: v.optional(v.string()),
     allergens: v.optional(v.array(v.string())),
     preparation: v.optional(v.string()),
     ingredients: v.optional(v.array(v.string())),

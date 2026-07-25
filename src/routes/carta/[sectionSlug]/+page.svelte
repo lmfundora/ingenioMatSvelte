@@ -185,7 +185,7 @@
                                 >
                                     <div class="space-y-1 text-end">
                                         <h3
-                                            class="font-italianno text-4xl leading-tight text-[#4A2E1B] md:text-4xl"
+                                            class="font-italianno text-4xl leading-tight text-[#4A2E1B] md:text-3xl"
                                         >
                                             {product.name}
                                         </h3>

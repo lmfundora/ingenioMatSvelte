@@ -18,10 +18,15 @@
 
     let { category = null, onClose, onSave }: Props = $props();
 
-    // Estado del formulario
-    let name = $state(category?.name ?? "");
+    // 1. Estado local editable para el input
+    let name = $state("");
     let error = $state<string | null>(null);
     let isSubmitting = $state(false);
+
+    // 2. Sincronizamos 'name' cuando cambie la prop 'category' (ej. al abrir el modal para otra categoría)
+    $effect(() => {
+        name = category?.name ?? "";
+    });
 
     async function handleSubmit(e: SubmitEvent) {
         e.preventDefault();

@@ -29,18 +29,29 @@
     const createSectionMutation = useMutation(api.sections.create);
     const updateSectionMutation = useMutation(api.sections.update);
 
-    // Estados del formulario
-    let name = $state(section?.name ?? "");
-    let description = $state(section?.description ?? "");
-    let order = $state(section?.order ?? 0);
-    let slug = $state(section?.slug ?? "");
-    let imageUrl = $state(section?.imageUrl ?? "");
+    // Declaración neutra de los estados locales del formulario
+    let name = $state("");
+    let description = $state("");
+    let order = $state(0);
+    let slug = $state("");
+    let imageUrl = $state("");
 
     let selectedFile = $state<File | null>(null);
-    let imagePreview = $state<string | null>(section?.imageUrl ?? null);
+    let imagePreview = $state<string | null>(null);
 
     let isSubmitting = $state(false);
     let isUploading = $state(false);
+
+    // Reset o actualización limpia de estados cuando cambie la prop 'section'
+    $effect(() => {
+        name = section?.name ?? "";
+        description = section?.description ?? "";
+        order = section?.order ?? 0;
+        slug = section?.slug ?? "";
+        imageUrl = section?.imageUrl ?? "";
+        imagePreview = section?.imageUrl ?? null;
+        selectedFile = null;
+    });
 
     // Genera un slug automáticamente si el usuario no escribe uno
     function generateSlug(text: string): string {

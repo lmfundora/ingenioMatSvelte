@@ -5,8 +5,8 @@
     import { registerSchema } from "$lib/schemas/register";
     import { authClient } from "$lib/auth-client";
     import { toast } from "$lib/toast";
-    import Button from "$lib/ui/Button.svelte";
-    import Input from "$lib/ui/TextInput.svelte";
+    import { Button } from "$lib/components/ui/button";
+    import { Input } from "$lib/components/ui/input";
 
     let isSubmittingAuth = $state(false);
 

@@ -127,7 +127,10 @@
 
                 <!-- Filtro por Sección -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-medium text-muted-foreground">
+                    <label
+                        for="sectionFilter"
+                        class="text-xs font-medium text-muted-foreground"
+                    >
                         Sección
                     </label>
                     <Select.Root type="single" bind:value={filterSection}>
@@ -149,7 +152,10 @@
 
                 <!-- Filtro por Categoría -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-medium text-muted-foreground">
+                    <label
+                        for="categoryFilter"
+                        class="text-xs font-medium text-muted-foreground"
+                    >
                         Categoría
                     </label>
                     <Select.Root type="single" bind:value={filterCategory}>

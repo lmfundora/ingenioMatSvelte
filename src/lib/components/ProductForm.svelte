@@ -19,6 +19,7 @@
     interface Section {
         _id: string;
         name: string;
+        slug: string;
     }
 
     interface Category {
@@ -28,8 +29,8 @@
 
     interface Props {
         product?: Partial<v.InferInput<ProductSchema>>;
-        sections?: Section[];
-        categories?: Category[];
+        sections: Section[];
+        categories: Category[];
         onSave: (data: v.InferOutput<ProductSchema>) => Promise<void>;
         onCancel: () => void;
         generateUploadUrl: (params: Record<string, never>) => Promise<string>;
@@ -44,102 +45,114 @@
         generateUploadUrl,
     }: Props = $props();
 
+    // Valores por defecto neutros
+    const initialValues = {
+        name: "",
+        slug: "",
+        description: "",
+        price: 0,
+        sectionSlug: "",
+        categoryId: "",
+        imageUrl: "",
+        allergens: [] as string[],
+    };
+
     // Configuración de Superforms
-    const form = superForm(
-        defaults(
-            {
-                name: product?.name ?? "",
-                slug: product?.slug ?? "",
-                description: product?.description ?? "",
-                price: typeof product?.price === "number" ? product.price : 0,
-                sectionId: product?.sectionId ?? "",
-                categoryId: product?.categoryId ?? "",
-                imageUrl: product?.imageUrl ?? "",
-                allergens: product?.allergens ?? [],
-            },
-            valibot(productSchema),
-        ),
-        {
-            SPA: true,
-            validators: valibot(productSchema),
-            async onUpdate({ form: f }) {
-                if (!f.valid) return;
+    const form = superForm(defaults(initialValues, valibot(productSchema)), {
+        SPA: true,
+        validators: valibot(productSchema),
+        async onUpdate({ form: f }) {
+            if (!f.valid) return;
 
-                isSubmitting = true;
-                try {
-                    let finalImageUrl = f.data.imageUrl;
+            isSubmitting = true;
+            try {
+                let finalImageUrl = f.data.imageUrl;
 
-                    // Carga de imagen si existe un archivo local
-                    if (imageFile) {
-                        isUploading = true;
-                        try {
-                            const optimizedImage = await optimizeImage(
-                                imageFile,
-                                {
-                                    maxWidth: 1200,
-                                    quality: 0.8,
-                                    format: "webp",
-                                },
-                            );
+                // Carga de imagen si existe un archivo local
+                if (imageFile) {
+                    isUploading = true;
+                    try {
+                        const optimizedImage = await optimizeImage(imageFile, {
+                            maxWidth: 1200,
+                            quality: 0.8,
+                            format: "webp",
+                        });
 
-                            const uploadUrl = await generateUploadUrl({});
-                            const response = await fetch(uploadUrl, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": optimizedImage.type,
-                                },
-                                body: optimizedImage,
-                            });
+                        const uploadUrl = await generateUploadUrl({});
+                        const response = await fetch(uploadUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": optimizedImage.type,
+                            },
+                            body: optimizedImage,
+                        });
 
-                            if (!response.ok)
-                                throw new Error("Error al subir la imagen");
+                        if (!response.ok)
+                            throw new Error("Error al subir la imagen");
 
-                            const { storageId } = await response.json();
-                            finalImageUrl = storageId;
-                            toast.success("Imagen subida correctamente");
-                        } catch (err) {
-                            toast.error("Error al procesar la imagen");
-                            console.error(err);
-                            return;
-                        } finally {
-                            isUploading = false;
-                        }
+                        const { storageId } = await response.json();
+                        finalImageUrl = storageId;
+                        toast.success("Imagen subida correctamente");
+                    } catch (err) {
+                        toast.error("Error al procesar la imagen");
+                        console.error(err);
+                        return;
+                    } finally {
+                        isUploading = false;
                     }
-
-                    // Slug automático
-                    const finalSlug =
-                        f.data.slug?.trim() ||
-                        f.data.name
-                            .toLowerCase()
-                            .normalize("NFD")
-                            .replace(/[\u0300-\u036f]/g, "")
-                            .replace(/[^a-z0-9]+/g, "-")
-                            .replace(/(^-|-$)/g, "");
-
-                    await onSave({
-                        ...f.data,
-                        imageUrl: finalImageUrl,
-                        slug: finalSlug,
-                    });
-                } finally {
-                    isSubmitting = false;
                 }
-            },
-        },
-    );
 
-    const { form: formData, errors, enhance } = form;
+                // Slug automático
+                const finalSlug =
+                    f.data.slug?.trim() ||
+                    f.data.name
+                        .toLowerCase()
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .replace(/[^a-z0-9]+/g, "-")
+                        .replace(/(^-|-$)/g, "");
+
+                await onSave({
+                    ...f.data,
+                    imageUrl: finalImageUrl,
+                    slug: finalSlug,
+                });
+            } finally {
+                isSubmitting = false;
+            }
+        },
+    });
+
+    const { form: formData, errors, enhance, reset } = form;
 
     // Estados UI de soporte mediante Runas ($state)
     let imageFile = $state<File | null>(null);
-    let imagePreview = $state<string | null>(product?.imageUrl ?? null);
+    let imagePreview = $state<string | null>(null);
     let isUploading = $state(false);
     let isSubmitting = $state(false);
     let allergenInput = $state("");
 
+    // Sincronización limpia cuando cambie la prop 'product'
+    $effect(() => {
+        reset({
+            data: {
+                name: product?.name ?? "",
+                slug: product?.slug ?? "",
+                description: product?.description ?? "",
+                price: typeof product?.price === "number" ? product.price : 0,
+                sectionSlug: product?.sectionSlug ?? "",
+                categoryId: product?.categoryId ?? "",
+                imageUrl: product?.imageUrl ?? "",
+                allergens: product?.allergens ?? [],
+            },
+        });
+        imagePreview = product?.imageUrl ?? null;
+        imageFile = null;
+    });
+
     // Labels seleccionados para los Selects de shadcn
     let selectedSectionLabel = $derived(
-        sections.find((s) => s._id === $formData.sectionId)?.name ??
+        sections.find(({ slug }) => slug === $formData.sectionSlug)?.name ??
             "Seleccionar sección",
     );
 
@@ -245,22 +258,22 @@
         <Label>Sección</Label>
         <Select.Root
             type="single"
-            value={$formData.sectionId}
-            onValueChange={(v) => ($formData.sectionId = v)}
+            value={$formData.sectionSlug}
+            onValueChange={(v) => ($formData.sectionSlug = v)}
         >
             <Select.Trigger class="w-full">
                 {selectedSectionLabel}
             </Select.Trigger>
             <Select.Content>
-                {#each sections as section (section._id)}
-                    <Select.Item value={section._id} label={section.name}>
+                {#each sections as section (section.slug)}
+                    <Select.Item value={section.slug} label={section.name}>
                         {section.name}
                     </Select.Item>
                 {/each}
             </Select.Content>
         </Select.Root>
-        {#if $errors.sectionId}
-            <p class="text-sm text-destructive">{$errors.sectionId}</p>
+        {#if $errors.sectionSlug}
+            <p class="text-sm text-destructive">{$errors.sectionSlug}</p>
         {/if}
     </div>
 

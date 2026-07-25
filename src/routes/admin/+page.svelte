@@ -67,7 +67,7 @@
                 return false;
             }
             // Filtro por sección
-            if (filterSection && product.sectionId !== filterSection) {
+            if (filterSection && product.slug !== filterSection) {
                 return false;
             }
             // Filtro por categoría
@@ -130,7 +130,7 @@
         editingProduct = null;
     }
 
-    async function handleSave(data: Record<string, any>) {
+    async function handleSave(data: Doc<"products">) {
         try {
             if (editingProduct) {
                 await updateProduct({ id: editingProduct._id, ...data });
@@ -167,7 +167,6 @@
 
             <SearchAndFilters
                 bind:searchQuery
-                bind:showFilters
                 bind:filterSection
                 bind:filterCategory
                 bind:filterPriceMin
@@ -183,7 +182,7 @@
 
         <!-- Estado de Carga -->
         {#if productsQuery.isLoading}
-            <div class="min-h-[400px] flex items-center justify-center">
+            <div class="min-h-100 flex items-center justify-center">
                 <div
                     class="h-6 w-6 animate-spin rounded-full border-2 border-neutral-200 border-t-neutral-900 dark:border-neutral-800 dark:border-t-neutral-100"
                 ></div>

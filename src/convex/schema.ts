@@ -2,16 +2,12 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  todos: defineTable({
-    text: v.string(),
-    completed: v.boolean(),
-  }),
   sections: defineTable({
     name: v.string(),
     description: v.string(),
     imageUrl: v.string(),
     order: v.number(),
-    slug: v.optional(v.string()),
+    slug: v.string(),
   })
     .index("by_slug", ["slug"])
     .index("by_order", ["order"]),
@@ -21,15 +17,17 @@ export default defineSchema({
   products: defineTable({
     name: v.string(),
     description: v.string(),
-    imageUrl: v.optional(v.string()),
+    imageUrl: v.string(),
     price: v.number(),
-    categoryId: v.optional(v.id("categories")),
-    sectionId: v.id("sections"),
+    categoryId: v.id("categories"),
+    // 1. Cambiamos de v.id("sections") a string para almacenar el slug
+    sectionSlug: v.string(),
     allergens: v.optional(v.array(v.string())),
     preparation: v.optional(v.string()),
     ingredients: v.optional(v.array(v.string())),
-    slug: v.optional(v.string()),
+    slug: v.string(),
   })
-    .index("by_section", ["sectionId"])
+    // 2. Indexamos por sectionSlug en lugar de sectionId
+    .index("by_section_slug", ["sectionSlug"])
     .index("by_slug", ["slug"]),
 });

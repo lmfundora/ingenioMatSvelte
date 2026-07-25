@@ -8,7 +8,7 @@ export const productSchema = v.object({
     v.number("El precio debe ser un número"),
     v.minValue(0.01, "El precio debe ser un número positivo"),
   ),
-  sectionId: v.pipe(v.string(), v.nonEmpty("La sección es requerida")),
+  sectionSlug: v.pipe(v.string(), v.nonEmpty("La sección es requerida")),
   categoryId: v.pipe(v.string(), v.nonEmpty("La categoría es requerida")),
   imageUrl: v.pipe(v.string(), v.nonEmpty("La imagen es requerida")),
   allergens: v.array(v.string()),

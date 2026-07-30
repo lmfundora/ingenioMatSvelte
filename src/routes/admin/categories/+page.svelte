@@ -158,7 +158,7 @@
             <div
                 class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-card p-6 shadow-xl"
             >
-                <h2 class="mb-6 font-serif text-xl font-bold tracking-widest">
+                <h2 class="mb-6 font-kanit text-xl font-bold tracking-widest">
                     {editingCategory ? "Editar categoría" : "Nueva categoría"}
                 </h2>
 

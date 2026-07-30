@@ -16,8 +16,6 @@
 
     // Tipos extraídos del modelo de Convex y Schemas
     type Product = Doc<"products">;
-    type Section = Doc<"sections">;
-    type Category = Doc<"categories">;
     type ProductFormData = InferOutput<ProductSchema>;
 
     // --- Estado Local (Svelte 5 Runes) ---
@@ -26,7 +24,6 @@
 
     // Filtros
     let searchQuery = $state("");
-    let filterSection = $state("");
     let filterCategory = $state("");
     let filterPriceMin = $state<number | undefined>(undefined);
     let filterPriceMax = $state<number | undefined>(undefined);
@@ -34,7 +31,6 @@
 
     // --- Consultas y Mutaciones de Convex ---
     const productsQuery = useQuery(api.products.list, {});
-    const sectionsQuery = useQuery(api.sections.list, {});
     const categoriesQuery = useQuery(api.categories.list, {});
 
     const removeProduct = useMutation(api.products.remove);
@@ -43,12 +39,6 @@
     const generateUploadUrl = useMutation(api.products.generateUploadUrl);
 
     // Helpers para nombres de sección/categoría
-    function getSectionName(sectionId: string) {
-        const section = (sectionsQuery.data as Section[] | undefined)?.find(
-            (s) => s._id === sectionId,
-        );
-        return section?.name || "Sin sección";
-    }
 
     function getCategoryName(
         categoryId: Id<"categories"> | string | null | undefined,
@@ -68,9 +58,6 @@
                 searchQuery &&
                 !product.name.toLowerCase().includes(searchQuery.toLowerCase())
             ) {
-                return false;
-            }
-            if (filterSection && product.slug !== filterSection) {
                 return false;
             }
             if (filterCategory && product.categoryId !== filterCategory) {
@@ -94,7 +81,6 @@
 
     let hasActiveFilters = $derived(
         Boolean(
-            filterSection ||
             filterCategory ||
             filterPriceMin !== undefined ||
             filterPriceMax !== undefined,
@@ -102,7 +88,6 @@
     );
 
     function clearFilters() {
-        filterSection = "";
         filterCategory = "";
         filterPriceMin = undefined;
         filterPriceMax = undefined;
@@ -177,15 +162,12 @@
 
             <SearchAndFilters
                 bind:searchQuery
-                bind:filterSection
                 bind:filterCategory
                 bind:filterPriceMin
                 bind:filterPriceMax
-                sections={sectionsQuery.data || []}
                 categories={categoriesQuery.data || []}
                 {hasActiveFilters}
                 onClearFilters={clearFilters}
-                {getSectionName}
                 {getCategoryName}
             />
         </div>
@@ -203,7 +185,6 @@
                 {#each filteredProducts as product (product._id)}
                     <ProductCard
                         {product}
-                        {getSectionName}
                         {getCategoryName}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
@@ -246,7 +227,6 @@
             <div class="flex-1 overflow-y-auto pr-1">
                 <ProductForm
                     product={editingProduct}
-                    sections={sectionsQuery.data || []}
                     categories={categoriesQuery.data || []}
                     onSave={handleSave}
                     onCancel={handleFormClose}

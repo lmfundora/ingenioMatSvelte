@@ -10,8 +10,6 @@
 
     interface Props {
         product: Product;
-        getSectionName: (sectionSlug: string) => string;
-        // Permite string, Id<"categories"> o null/undefined
         getCategoryName: (
             categoryId: Id<"categories"> | string | null | undefined,
         ) => string;
@@ -19,14 +17,7 @@
         onDelete: (id: Id<"products">) => void;
     }
 
-    let { product, getSectionName, getCategoryName, onEdit, onDelete }: Props =
-        $props();
-
-    let isDescriptionExpanded = $state(false);
-
-    let shouldShowExpandButton = $derived(
-        Boolean(product.description && product.description.length > 70),
-    );
+    let { product, getCategoryName, onEdit, onDelete }: Props = $props();
 </script>
 
 <Card.Root
@@ -59,22 +50,10 @@
                 >
                     {product.name}
                 </h3>
-                <span
-                    class="font-bold text-sm tracking-tight text-foreground shrink-0"
-                >
-                    ${product.price.toFixed(2)}
-                </span>
             </div>
 
             <!-- Badges (Sección & Categoría) -->
             <div class="flex flex-wrap gap-1 pt-0.5">
-                <Badge
-                    variant="secondary"
-                    class="font-normal text-[10px] px-1.5 py-0 h-4"
-                >
-                    <!-- Ajustado a product.sectionSlug -->
-                    {getSectionName(product.sectionSlug)}
-                </Badge>
                 {#if product.categoryId}
                     <Badge
                         variant="outline"
@@ -86,49 +65,10 @@
             </div>
         </div>
 
-        <!-- Descripción -->
-        {#if product.description}
-            <div class="text-xs text-muted-foreground leading-relaxed">
-                <p class={isDescriptionExpanded ? "" : "line-clamp-2"}>
-                    {product.description}
-                </p>
-                {#if shouldShowExpandButton}
-                    <button
-                        type="button"
-                        onclick={() =>
-                            (isDescriptionExpanded = !isDescriptionExpanded)}
-                        class="mt-0.5 inline-flex items-center gap-0.5 text-[11px] text-primary font-medium hover:underline focus:outline-none"
-                    >
-                        {#if isDescriptionExpanded}
-                            Ver menos <ChevronUp size={11} />
-                        {:else}
-                            Ver más <ChevronDown size={11} />
-                        {/if}
-                    </button>
-                {/if}
-            </div>
-        {/if}
-
         <!-- Footer / Acciones -->
         <div
             class="pt-1.5 flex items-center justify-between gap-2 border-t border-border/40 mt-auto"
         >
-            <!-- Alérgenos -->
-            <div class="min-w-0 flex-1">
-                {#if product.allergens && product.allergens.length > 0}
-                    <p class="truncate text-[11px] text-muted-foreground">
-                        <span class="font-medium text-foreground/70"
-                            >Alérgenos:</span
-                        >
-                        {product.allergens.join(", ")}
-                    </p>
-                {:else}
-                    <span class="text-[11px] text-muted-foreground/50 italic"
-                        >Sin alérgenos</span
-                    >
-                {/if}
-            </div>
-
             <!-- Botones -->
             <div class="flex items-center gap-1 shrink-0">
                 <Button

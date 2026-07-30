@@ -6,11 +6,6 @@
     import * as Popover from "$lib/components/ui/popover/index.js";
     import * as Select from "$lib/components/ui/select/index.js";
 
-    interface Section {
-        _id: string;
-        name: string;
-    }
-
     interface Category {
         _id: string;
         name: string;
@@ -18,39 +13,24 @@
 
     interface Props {
         searchQuery: string;
-        filterSection?: string;
         filterCategory?: string;
-        filterPriceMin?: number | undefined;
-        filterPriceMax?: number | undefined;
-        sections?: Section[];
         categories?: Category[];
         hasActiveFilters?: boolean;
         onClearFilters: () => void;
-        getSectionName: (sectionId: string) => string;
         getCategoryName: (categoryId: string | null) => string;
     }
 
     let {
         searchQuery = $bindable(""),
-        filterSection = $bindable(""),
         filterCategory = $bindable(""),
-        filterPriceMin = $bindable<number | undefined>(undefined),
-        filterPriceMax = $bindable<number | undefined>(undefined),
-        sections = [],
         categories = [],
         hasActiveFilters = false,
         onClearFilters,
-        getSectionName,
         getCategoryName,
     }: Props = $props();
 
     // Control local para abrir/cerrar el Popover
     let popoverOpen = $state(false);
-
-    // Labels dinámicos para los Select triggers
-    let selectedSectionLabel = $derived(
-        filterSection ? getSectionName(filterSection) : "Todas las secciones",
-    );
 
     let selectedCategoryLabel = $derived(
         filterCategory
@@ -125,31 +105,6 @@
                     </div>
                 </div>
 
-                <!-- Filtro por Sección -->
-                <div class="space-y-1.5">
-                    <label
-                        for="sectionFilter"
-                        class="text-xs font-medium text-muted-foreground"
-                    >
-                        Sección
-                    </label>
-                    <Select.Root type="single" bind:value={filterSection}>
-                        <Select.Trigger class="w-full">
-                            {selectedSectionLabel}
-                        </Select.Trigger>
-                        <Select.Content>
-                            <Select.Item value=""
-                                >Todas las secciones</Select.Item
-                            >
-                            {#each sections as section (section._id)}
-                                <Select.Item value={section._id}>
-                                    {section.name}
-                                </Select.Item>
-                            {/each}
-                        </Select.Content>
-                    </Select.Root>
-                </div>
-
                 <!-- Filtro por Categoría -->
                 <div class="space-y-1.5">
                     <label
@@ -175,41 +130,6 @@
                     </Select.Root>
                 </div>
 
-                <!-- Filtro por Rango de Precio -->
-                <div class="space-y-1.5">
-                    <span class="text-xs font-medium text-muted-foreground">
-                        Rango de precio
-                    </span>
-                    <div class="flex gap-2">
-                        <Input
-                            type="number"
-                            placeholder="Mín"
-                            value={filterPriceMin ?? ""}
-                            oninput={(e) => {
-                                const val = e.currentTarget.value;
-                                filterPriceMin =
-                                    val && Number(val) > 0
-                                        ? Number(val)
-                                        : undefined;
-                            }}
-                            class="h-9"
-                        />
-                        <Input
-                            type="number"
-                            placeholder="Máx"
-                            value={filterPriceMax ?? ""}
-                            oninput={(e) => {
-                                const val = e.currentTarget.value;
-                                filterPriceMax =
-                                    val && Number(val) > 0
-                                        ? Number(val)
-                                        : undefined;
-                            }}
-                            class="h-9"
-                        />
-                    </div>
-                </div>
-
                 <!-- Botón de Listo / Aplicar para cerrar -->
                 <Button
                     class="w-full mt-2"
@@ -224,19 +144,6 @@
         <!-- Badges de Filtros Activos -->
         {#if hasActiveFilters}
             <div class="flex flex-wrap gap-2 items-center">
-                {#if filterSection}
-                    <Badge variant="secondary" class="gap-1.5 pr-1.5">
-                        <span>Sección: {getSectionName(filterSection)}</span>
-                        <button
-                            type="button"
-                            onclick={() => (filterSection = "")}
-                            class="rounded-full hover:bg-muted p-0.5 transition-colors"
-                        >
-                            <Close size={12} />
-                        </button>
-                    </Badge>
-                {/if}
-
                 {#if filterCategory}
                     <Badge variant="secondary" class="gap-1.5 pr-1.5">
                         <span>Categoría: {getCategoryName(filterCategory)}</span
@@ -244,25 +151,6 @@
                         <button
                             type="button"
                             onclick={() => (filterCategory = "")}
-                            class="rounded-full hover:bg-muted p-0.5 transition-colors"
-                        >
-                            <Close size={12} />
-                        </button>
-                    </Badge>
-                {/if}
-
-                {#if filterPriceMin !== undefined || filterPriceMax !== undefined}
-                    <Badge variant="secondary" class="gap-1.5 pr-1.5">
-                        <span>
-                            Precio: ${filterPriceMin ?? "0"} - ${filterPriceMax ??
-                                "∞"}
-                        </span>
-                        <button
-                            type="button"
-                            onclick={() => {
-                                filterPriceMin = undefined;
-                                filterPriceMax = undefined;
-                            }}
                             class="rounded-full hover:bg-muted p-0.5 transition-colors"
                         >
                             <Close size={12} />

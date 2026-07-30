@@ -1,561 +1,230 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Italianno&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Italianno&family=Manrope:wght@400;500;600;700;800&display=swap");
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn-svelte/tailwind.css";
 @import "@fontsource-variable/inter";
 
-@custom-variant dark (&:is(.dark *));
-
-/* Agregamos Fraunces, Manrope, Italianno e Instrument Sans en el mismo llamado */
 @plugin '@tailwindcss/typography';
 
-/* 3. Definición de fuentes y variables de tema */
+/* Configuración de variante oscura */
+@custom-variant dark (&:is(.dark *));
+
+/* Carga de fuente local Kanit */
+@font-face {
+    font-family: "Kanit";
+    src: url("/fonts/Kanit-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ==========================================================================
+   CONFIGURACIÓN DEL TEMA (TAILWIND v4 THEME CONFIG)
+   ========================================================================== */
 @theme {
-    --font-italianno: "Italianno", cursive;
+    /* Fuentes */
+    --font-sans: "Kanit", "Instrument Sans", sans-serif;
+    --font-kanit: "Kanit", sans-serif;
+    --font-heading: "Kanit", sans-serif;
     --font-instrument: "Instrument Sans", sans-serif;
-    --font-sans: "Inter Variable", sans-serif;
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
+    --font-italianno: "Italianno", cursive;
+
+    /* Mapeo de tokens de diseño */
     --color-background: var(--background);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    /* Gráficos / Charts */
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    /* Radios de bordes */
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-xl: calc(var(--radius) + 4px);
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
+    /* Sidebar de Shadcn */
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ==========================================================================
+   VARIABLES DE ESTILO - MODO CLARO
+   ========================================================================== */
 :root {
-    --sea-ink: #173a40;
-    --sea-ink-soft: #416166;
-    --lagoon: #4fb8b2;
-    --lagoon-deep: #328f97;
-    --palm: #2f6a4a;
-    --sand: #e7f0e8;
-    --foam: #f3faf5;
-    --surface: rgba(255, 255, 255, 0.74);
-    --surface-strong: rgba(255, 255, 255, 0.9);
-    --line: rgba(23, 58, 64, 0.14);
-    --inset-glint: rgba(255, 255, 255, 0.82);
-    --kicker: rgba(47, 106, 74, 0.9);
-    --bg-base: #fff6ef;
-    /* <-- Cambiado de #e7f3ec */
-    --background: oklch(1 0 0);
-    /* <-- Color crema en oklch */
-    --header-bg: rgba(251, 255, 248, 0.84);
-    --chip-bg: rgba(255, 255, 255, 0.8);
-    --chip-line: rgba(47, 106, 74, 0.18);
-    --link-bg-hover: rgba(255, 255, 255, 0.9);
-    --hero-a: rgba(79, 184, 178, 0.36);
-    --hero-b: rgba(47, 106, 74, 0.2);
-    --text-dark: #1e1e1e;
+    /* Paleta Base Hex/RGB */
+    --color-rojo: #bf1721;
+    --color-crema: #f4d5b6;
+    --color-crema-claro: #fcf8f2;
+    --color-negro: #0d0d0d;
+    --color-blanco: #ffffff;
 
-    /*--background: oklch(98% 0.016 73.684);*/
-    --foreground: oklch(0.145 0 0);
+    /* Estructura Shadcn (Modo Claro) */
+    --background: oklch(100% 0.00011 271.152);
+    --foreground: oklch(0.12 0.01 20);
+
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --card-foreground: oklch(0.12 0.01 20);
+
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --popover-foreground: oklch(0.12 0.01 20);
 
-    /* Variables de fuente para shadcn/ui */
-    --font-sans: "Instrument Sans", sans-serif;
-    --font-heading: "Instrument Sans", sans-serif;
+    /* Rojo Accent Primario */
+    --primary: oklch(0.46 0.21 26.5);
+    --primary-foreground: oklch(1 0 0);
+
+    /* Crema Secundario */
+    --secondary: oklch(0.88 0.06 64.5);
+    --secondary-foreground: oklch(0.12 0.01 20);
+
+    --muted: oklch(0.94 0.02 65);
+    --muted-foreground: oklch(0.45 0.02 45);
+
+    --accent: oklch(0.92 0.04 64);
+    --accent-foreground: oklch(0.46 0.21 26.5);
+
+    --destructive: oklch(0.4 0.21 26.5);
+    --destructive-foreground: oklch(1 0 0);
+
+    --border: oklch(0.85 0.04 65);
+    --input: oklch(0.85 0.04 65);
+    --ring: oklch(0.46 0.21 26.5);
+
+    --chart-1: oklch(0.46 0.21 26.5);
+    --chart-2: oklch(0.88 0.06 64.5);
+    --chart-3: oklch(0.25 0.02 25);
+    --chart-4: oklch(0.65 0.12 35);
+    --chart-5: oklch(0.93 0.05 70);
+
+    --sidebar: oklch(0.96 0.02 55);
+    --sidebar-foreground: oklch(0.12 0.01 20);
+    --sidebar-primary: oklch(0.46 0.21 26.5);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.88 0.06 64.5);
+    --sidebar-accent-foreground: oklch(0.12 0.01 20);
+    --sidebar-border: oklch(0.85 0.04 65);
+    --sidebar-ring: oklch(0.46 0.21 26.5);
+
+    --radius: 0.5rem;
+
+    /* Variables del Layout General */
+    --sea-ink: var(--color-negro);
+    --sea-ink-soft: oklch(0.45 0.02 45);
+    --lagoon: var(--color-rojo);
+    --lagoon-deep: oklch(0.38 0.18 26.5);
+    --palm: var(--color-negro);
+    --sand: var(--color-crema-claro);
+    --foam: var(--color-blanco);
+    --surface: rgba(255, 255, 255, 0.75);
+    --surface-strong: rgba(255, 255, 255, 0.95);
+    --line: oklch(0.12 0.01 20 / 12%);
+    --inset-glint: rgba(255, 255, 255, 0.85);
+    --kicker: var(--color-rojo);
+    --bg-base: var(--color-crema-claro);
+    --header-bg: rgba(252, 248, 242, 0.85);
+    --chip-bg: var(--color-crema);
+    --chip-line: rgba(191, 23, 33, 0.15);
+    --link-bg-hover: rgba(191, 23, 33, 0.05);
+    --hero-a: rgba(244, 213, 182, 0.4);
+    --hero-b: rgba(191, 23, 33, 0.06);
+    --text-dark: #1e1e1e;
 }
 
-.vinetta {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-
-    background: radial-gradient(
-            76.39% 51.99% at 76.39% 48.01%,
-            rgba(102, 102, 102, 0) 1.87%,
-            rgba(21, 21, 21, 0.45) 67.31%,
-            rgba(0, 0, 0, 0.6) 86.54%,
-            rgba(0, 0, 0, 0.8) 99.52%
-        )
-        /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
-}
-
-/* Scroll-driven animations using CSS transitions */
-.hero-title {
-    font-size: 4rem;
-    color: white;
-    top: 40%;
-    left: 15%;
-    transition: all 0.7s ease-out;
-}
-
-@media (min-width: 768px) {
-    .hero-title {
-        font-size: 8rem;
-        color: white;
-        top: 40%;
-        left: 15%;
-    }
-}
-
-@media (min-width: 1024px) {
-    .hero-title {
-        font-size: 9rem;
-        color: white;
-        top: 40%;
-        left: 15%;
-    }
-}
-
-.hero-button {
-    top: 52%;
-    left: 35%;
-    transform: translateX(-50%);
-    transition: all 0.7s ease-out;
-}
-
-@media (min-width: 768px) {
-    .hero-button {
-        top: 65%;
-        left: 25%;
-        transform: translateX(-50%);
-    }
-}
-
-@media (min-width: 1024px) {
-    .hero-button {
-        top: 65%;
-        left: 21%;
-        transform: translateX(-50%);
-    }
-}
-
-.white-panel {
-    transform: translateY(100%);
-    transition: transform 0.7s ease-out;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .white-panel {
-        width: 75%;
-    }
-}
-
-@media (min-width: 1024px) {
-    .white-panel {
-        width: 50%;
-    }
-}
-
-/* Scrolled state */
-body.scrolled .hero-title {
-    font-size: 4rem;
-    color: var(--text-dark);
-    top: 25%;
-    left: 24%;
-}
-
-@media (min-width: 768px) {
-    body.scrolled .hero-title {
-        font-size: 5rem;
-        color: var(--text-dark);
-        top: 20%;
-        left: 15%;
-    }
-}
-
-@media (min-width: 1024px) {
-    body.scrolled .hero-title {
-        font-size: 5rem;
-        color: var(--text-dark);
-        top: 20%;
-        left: 15%;
-    }
-}
-
-body.scrolled .hero-button button {
-    background-color: var(--text-dark);
-    color: white;
-    border-color: var(--text-dark);
-}
-
-body.scrolled .hero-button {
-    top: 60%;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-@media (min-width: 768px) {
-    body.scrolled .hero-button {
-        top: 62%;
-        left: 32%;
-        transform: translateX(-50%);
-    }
-}
-
-@media (min-width: 1024px) {
-    body.scrolled .hero-button {
-        top: 62%;
-        left: 24.5%;
-        transform: translateX(-50%);
-    }
-}
-
-body.scrolled .white-panel {
-    transform: translateY(0);
-}
-
-@keyframes draw {
-    0% {
-        stroke-dashoffset: 12000;
-        fill-opacity: 0;
-    }
-
-    50% {
-        stroke-dashoffset: 0;
-        fill-opacity: 0.15;
-    }
-
-    100% {
-        stroke-dashoffset: 12000;
-        fill-opacity: 0;
-    }
-}
-
-.animate-draw {
-    stroke-dasharray: 12000;
-    stroke-dashoffset: 12000;
-    animation: draw 30s linear infinite;
-}
-
-/*.vignette-container {
-    position: relative;
-    overflow: visible;
-    border-radius: 12px;
-}*/
-
-/* Shadow 4 Inner Shadow — applied directly ON TOP of the image */
-/*.vignette-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 4;
-    box-shadow:
-        inset -15px -15px 33px rgba(13, 39, 80, 0.8),
-        inset 16px 16px 38px rgba(255, 255, 255, 0.9);
-}*/
-
-/*.vignette-blur {
-    position: absolute;
-    width: calc(100% + 24px);
-    height: calc(100% + 24px);
-    object-fit: cover;
-    filter: blur(20px) brightness(1.15) saturate(1.3);
-    opacity: 0.35;
-    z-index: -1;
-    border-radius: 18px;
-}*/
-
-.vignette-container img:not(.vignette-blur) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: relative;
-    z-index: 1;
-    box-shadow: 16px 16px 38px rgba(250, 109, 2, 0.2);
-}
-
-.vinetta {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-
-    background: radial-gradient(
-            76.39% 51.99% at 76.39% 48.01%,
-            rgba(102, 102, 102, 0) 1.87%,
-            rgba(21, 21, 21, 0.45) 67.31%,
-            rgba(0, 0, 0, 0.6) 86.54%,
-            rgba(0, 0, 0, 0.8) 99.52%
-        )
-        /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
-}
-
-/* Scroll-driven animations using CSS transitions */
-.hero-title {
-    font-size: 4rem;
-    color: white;
-    top: 40%;
-    left: 15%;
-    transition: all 0.7s ease-out;
-}
-
-@media (min-width: 768px) {
-    .hero-title {
-        font-size: 8rem;
-        color: white;
-        top: 40%;
-        left: 15%;
-    }
-}
-
-@media (min-width: 1024px) {
-    .hero-title {
-        font-size: 9rem;
-        color: white;
-        top: 40%;
-        left: 15%;
-    }
-}
-
-.hero-button {
-    top: 52%;
-    left: 35%;
-    transform: translateX(-50%);
-    transition: all 0.7s ease-out;
-}
-
-@media (min-width: 768px) {
-    .hero-button {
-        top: 65%;
-        left: 25%;
-        transform: translateX(-50%);
-    }
-}
-
-@media (min-width: 1024px) {
-    .hero-button {
-        top: 65%;
-        left: 21%;
-        transform: translateX(-50%);
-    }
-}
-
-.white-panel {
-    transform: translateY(100%);
-    transition: transform 0.7s ease-out;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .white-panel {
-        width: 75%;
-    }
-}
-
-@media (min-width: 1024px) {
-    .white-panel {
-        width: 50%;
-    }
-}
-
-/* Scrolled state */
-body.scrolled .hero-title {
-    font-size: 4rem;
-    color: var(--text-dark);
-    top: 25%;
-    left: 24%;
-}
-
-@media (min-width: 768px) {
-    body.scrolled .hero-title {
-        font-size: 5rem;
-        color: var(--text-dark);
-        top: 20%;
-        left: 15%;
-    }
-}
-
-@media (min-width: 1024px) {
-    body.scrolled .hero-title {
-        font-size: 5rem;
-        color: var(--text-dark);
-        top: 20%;
-        left: 15%;
-    }
-}
-
-body.scrolled .hero-button button {
-    background-color: var(--text-dark);
-    color: white;
-    border-color: var(--text-dark);
-}
-
-body.scrolled .hero-button {
-    top: 60%;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-@media (min-width: 768px) {
-    body.scrolled .hero-button {
-        top: 62%;
-        left: 32%;
-        transform: translateX(-50%);
-    }
-}
-
-@media (min-width: 1024px) {
-    body.scrolled .hero-button {
-        top: 62%;
-        left: 24.5%;
-        transform: translateX(-50%);
-    }
-}
-
-body.scrolled .white-panel {
-    transform: translateY(0);
-}
-
-@keyframes draw {
-    0% {
-        stroke-dashoffset: 12000;
-        fill-opacity: 0;
-    }
-
-    50% {
-        stroke-dashoffset: 0;
-        fill-opacity: 0.15;
-    }
-
-    100% {
-        stroke-dashoffset: 12000;
-        fill-opacity: 0;
-    }
-}
-
-.animate-draw {
-    stroke-dasharray: 12000;
-    stroke-dashoffset: 12000;
-    animation: draw 30s linear infinite;
-}
-
-/*.vignette-container {
-    position: relative;
-    overflow: visible;
-    border-radius: 12px;
-}*/
-
-/* Shadow 4 Inner Shadow — applied directly ON TOP of the image */
-/*.vignette-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 4;
-    box-shadow:
-        inset -15px -15px 33px rgba(13, 39, 80, 0.8),
-        inset 16px 16px 38px rgba(255, 255, 255, 0.9);
-}*/
-
-/*.vignette-blur {
-    position: absolute;
-    width: calc(100% + 24px);
-    height: calc(100% + 24px);
-    object-fit: cover;
-    filter: blur(20px) brightness(1.15) saturate(1.3);
-    opacity: 0.35;
-    z-index: -1;
-    border-radius: 18px;
-}*/
-
-.vignette-container img:not(.vignette-blur) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: relative;
-    z-index: 1;
-    box-shadow: 16px 16px 38px rgba(250, 109, 2, 0.2);
-}
-
+/* ==========================================================================
+   VARIABLES DE ESTILO - MODO OSCURO
+   ========================================================================== */
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --background: oklch(0.12 0.01 20);
+    --foreground: oklch(0.98 0 0);
+
+    --card: oklch(0.16 0.01 20);
+    --card-foreground: oklch(0.98 0 0);
+
+    --popover: oklch(0.14 0.01 20);
+    --popover-foreground: oklch(0.98 0 0);
+
+    --primary: oklch(0.46 0.21 26.5);
+    --primary-foreground: oklch(1 0 0);
+
+    --secondary: oklch(0.22 0.01 20);
+    --secondary-foreground: oklch(0.88 0.06 64.5);
+
+    --muted: oklch(0.2 0.01 20);
+    --muted-foreground: oklch(0.65 0.02 50);
+
+    --accent: oklch(0.22 0.01 20);
+    --accent-foreground: oklch(0.88 0.06 64.5);
+
+    --destructive: oklch(0.46 0.21 26.5);
+    --destructive-foreground: oklch(1 0 0);
+
+    --border: oklch(0.25 0.01 20);
+    --input: oklch(0.25 0.01 20);
+    --ring: oklch(0.46 0.21 26.5);
+
+    --sidebar: oklch(0.14 0.01 20);
+    --sidebar-foreground: oklch(0.98 0 0);
+    --sidebar-primary: oklch(0.46 0.21 26.5);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.22 0.01 20);
+    --sidebar-accent-foreground: oklch(0.88 0.06 64.5);
+    --sidebar-border: oklch(0.25 0.01 20);
+    --sidebar-ring: oklch(0.46 0.21 26.5);
+
+    --sea-ink: #ffffff;
+    --sea-ink-soft: oklch(0.65 0.02 50);
+    --lagoon: var(--color-crema);
+    --lagoon-deep: #ffffff;
+    --palm: var(--color-rojo);
+    --sand: #121212;
+    --foam: #1a1a1a;
+    --surface: rgba(20, 20, 20, 0.7);
+    --surface-strong: rgba(26, 26, 26, 0.9);
+    --line: rgba(255, 255, 255, 0.1);
+    --inset-glint: rgba(255, 255, 255, 0.05);
+    --kicker: var(--color-crema);
+    --bg-base: #0a0a0a;
+    --header-bg: rgba(13, 13, 13, 0.85);
+    --chip-bg: rgba(35, 35, 35, 0.9);
+    --chip-line: rgba(244, 213, 182, 0.2);
+    --link-bg-hover: rgba(255, 255, 255, 0.04);
+    --hero-a: rgba(191, 23, 33, 0.12);
+    --hero-b: rgba(0, 0, 0, 0.5);
 }
 
+/* ==========================================================================
+   ESTILOS GLOBALES Y CAPAS
+   ========================================================================== */
 @layer base {
     * {
         @apply border-border outline-ring/50;
@@ -566,4 +235,164 @@ body.scrolled .white-panel {
     html {
         @apply font-sans;
     }
+}
+
+/* ==========================================================================
+   CLASES PERSONALIZADAS Y ANIMACIONES DE HERO (SCROLL)
+   ========================================================================== */
+.vinetta {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: radial-gradient(
+        76.39% 51.99% at 76.39% 48.01%,
+        rgba(102, 102, 102, 0) 1.87%,
+        rgba(21, 21, 21, 0.45) 67.31%,
+        rgba(0, 0, 0, 0.6) 86.54%,
+        rgba(0, 0, 0, 0.8) 99.52%
+    );
+}
+
+.hero-title {
+    font-size: 4rem;
+    color: white;
+    top: 40%;
+    left: 15%;
+    transition: all 0.7s ease-out;
+}
+
+@media (min-width: 768px) {
+    .hero-title {
+        font-size: 8rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-title {
+        font-size: 9rem;
+    }
+}
+
+.hero-button {
+    top: 52%;
+    left: 35%;
+    transform: translateX(-50%);
+    transition: all 0.7s ease-out;
+}
+
+@media (min-width: 768px) {
+    .hero-button {
+        top: 65%;
+        left: 25%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-button {
+        top: 65%;
+        left: 21%;
+    }
+}
+
+.white-panel {
+    transform: translateY(100%);
+    transition: transform 0.7s ease-out;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .white-panel {
+        width: 75%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .white-panel {
+        width: 50%;
+    }
+}
+
+/* Estado al hacer scroll (`body.scrolled`) */
+body.scrolled .hero-title {
+    font-size: 4rem;
+    color: var(--text-dark);
+    top: 25%;
+    left: 24%;
+}
+
+@media (min-width: 768px) {
+    body.scrolled .hero-title {
+        font-size: 5rem;
+        top: 20%;
+        left: 15%;
+    }
+}
+
+@media (min-width: 1024px) {
+    body.scrolled .hero-title {
+        font-size: 5rem;
+        top: 20%;
+        left: 15%;
+    }
+}
+
+body.scrolled .hero-button button {
+    background-color: var(--text-dark);
+    color: white;
+    border-color: var(--text-dark);
+}
+
+body.scrolled .hero-button {
+    top: 60%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+@media (min-width: 768px) {
+    body.scrolled .hero-button {
+        top: 62%;
+        left: 32%;
+    }
+}
+
+@media (min-width: 1024px) {
+    body.scrolled .hero-button {
+        top: 62%;
+        left: 24.5%;
+    }
+}
+
+body.scrolled .white-panel {
+    transform: translateY(0);
+}
+
+/* Animación de trazado SVG */
+@keyframes draw {
+    0% {
+        stroke-dashoffset: 12000;
+        fill-opacity: 0;
+    }
+    50% {
+        stroke-dashoffset: 0;
+        fill-opacity: 0.15;
+    }
+    100% {
+        stroke-dashoffset: 12000;
+        fill-opacity: 0;
+    }
+}
+
+.animate-draw {
+    stroke-dasharray: 12000;
+    stroke-dashoffset: 12000;
+    animation: draw 30s linear infinite;
+}
+
+.vignette-container img:not(.vignette-blur) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+    box-shadow: 16px 16px 38px rgba(250, 109, 2, 0.2);
 }

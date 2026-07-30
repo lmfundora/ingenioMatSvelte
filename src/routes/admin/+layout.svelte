@@ -2,17 +2,31 @@
     import { page } from "$app/state";
     import { goto } from "$app/navigation";
     import { authClient } from "$lib/auth-client";
-    import { Menu, X, Users, Folder, Package, LogOut } from "@lucide/svelte";
+    import { Menu, X, Users, Folder, Package, LogOut, Wrench, ChevronDown, Megaphone } from "@lucide/svelte";
 
     // Props en Svelte 5 (recibe data desde +layout.server.ts y las rutas hijas)
     let { data, children } = $props();
 
     let drawerOpen = $state(false);
 
+    let expandedMenus: Record<string, boolean> = $state({});
+
+    function toggleMenu(label: string) {
+        expandedMenus[label] = !expandedMenus[label];
+    }
+
     const menuItems = [
         { icon: Package, label: "Productos", href: "/admin" },
-        { icon: Users, label: "Secciones", href: "/admin/sections" },
         { icon: Folder, label: "Categorías", href: "/admin/categories" },
+        { 
+            icon: Wrench, 
+            label: "Servicios", 
+            children: [
+                { label: "Tipos de Servicio", href: "/admin/servicios/tipos" },
+                { label: "Gestión de Servicios", href: "/admin/servicios/gestion" }
+            ]
+        },
+        { icon: Megaphone, label: "Ofertas", href: "/admin/ofertas" },
     ];
 
     async function handleLogout() {
@@ -43,9 +57,12 @@
                     <Menu size={24} />
                 {/if}
             </button>
-            <h1 class="text-xl font-bold tracking-widest font-italianno">
-                Don Quijote
-            </h1>
+            <img
+                alt="Ingenio Mat logo"
+                src="/WhatsApp Image 2026-06-18 at 18.35.29.svg"
+                width="150"
+                class="mx-auto"
+            />
         </div>
 
         <div class="flex items-center gap-4">
@@ -82,17 +99,49 @@
         <nav class="p-4 space-y-2">
             {#each menuItems as item}
                 {@const Icon = item.icon}
-                {@const isActive = page.url.pathname === item.href}
-                <a
-                    href={item.href}
-                    onclick={() => (drawerOpen = false)}
-                    class={`flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-accent transition-colors text-foreground tracking-wide ${
-                        isActive ? "bg-accent font-semibold" : ""
-                    }`}
-                >
-                    <Icon size={20} />
-                    <span class="font-sans">{item.label}</span>
-                </a>
+                {#if item.children}
+                    {@const isExpanded = expandedMenus[item.label]}
+                    <div class="space-y-1">
+                        <button
+                            onclick={() => toggleMenu(item.label)}
+                            class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-accent transition-colors text-foreground tracking-wide"
+                        >
+                            <div class="flex items-center gap-3">
+                                <Icon size={20} />
+                                <span class="font-sans">{item.label}</span>
+                            </div>
+                            <ChevronDown size={16} class={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                        </button>
+                        {#if isExpanded}
+                            <div class="pl-11 space-y-1">
+                                {#each item.children as child}
+                                    {@const isChildActive = page.url.pathname === child.href}
+                                    <a
+                                        href={child.href}
+                                        onclick={() => (drawerOpen = false)}
+                                        class={`block px-4 py-2 text-sm rounded-lg hover:bg-accent transition-colors text-foreground tracking-wide ${
+                                            isChildActive ? "bg-accent font-semibold" : ""
+                                        }`}
+                                    >
+                                        {child.label}
+                                    </a>
+                                {/each}
+                            </div>
+                        {/if}
+                    </div>
+                {:else}
+                    {@const isActive = page.url.pathname === item.href}
+                    <a
+                        href={item.href}
+                        onclick={() => (drawerOpen = false)}
+                        class={`flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-accent transition-colors text-foreground tracking-wide ${
+                            isActive ? "bg-accent font-semibold" : ""
+                        }`}
+                    >
+                        <Icon size={20} />
+                        <span class="font-sans">{item.label}</span>
+                    </a>
+                {/if}
             {/each}
         </nav>
     </aside>

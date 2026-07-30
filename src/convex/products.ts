@@ -44,23 +44,6 @@ export const list = query({
   },
 });
 
-export const listBySectionSlug = query({
-  args: { sectionSlug: v.string() },
-  handler: async (ctx, args) => {
-    const products = await ctx.db
-      .query("products")
-      .withIndex("by_section_slug", (q) =>
-        q.eq("sectionSlug", args.sectionSlug),
-      )
-      .collect();
-
-    // AHORA SÍ: Mapeamos los productos para resolver las URLs de las imágenes
-    return await Promise.all(
-      products.map((product) => resolveProductImage(ctx, product)),
-    );
-  },
-});
-
 export const getById = query({
   args: { id: v.id("products") },
   handler: async (ctx, args) => {
@@ -86,14 +69,8 @@ export const getBySlug = query({
 export const create = mutation({
   args: {
     name: v.string(),
-    description: v.string(),
     imageUrl: v.string(),
-    price: v.number(),
     categoryId: v.id("categories"),
-    sectionSlug: v.string(),
-    allergens: v.optional(v.array(v.string())),
-    preparation: v.optional(v.string()),
-    ingredients: v.optional(v.array(v.string())),
     slug: v.string(),
   },
   handler: async (ctx, args) => {
@@ -107,14 +84,8 @@ export const create = mutation({
 
     const newProduct = {
       name: args.name,
-      description: args.description,
       imageUrl: args.imageUrl,
-      price: args.price,
       categoryId: args.categoryId,
-      sectionSlug: args.sectionSlug,
-      allergens: args.allergens,
-      preparation: args.preparation,
-      ingredients: args.ingredients,
       slug: args.slug,
     };
     const id = await ctx.db.insert("products", newProduct);
@@ -126,14 +97,8 @@ export const update = mutation({
   args: {
     id: v.id("products"),
     name: v.optional(v.string()),
-    description: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
-    price: v.optional(v.number()),
     categoryId: v.optional(v.id("categories")),
-    sectionSlug: v.optional(v.id("sections")),
-    allergens: v.optional(v.array(v.string())),
-    preparation: v.optional(v.string()),
-    ingredients: v.optional(v.array(v.string())),
     slug: v.optional(v.string()),
   },
   handler: async (ctx, args) => {

@@ -16,12 +16,6 @@
     import { Badge } from "$lib/components/ui/badge";
     import * as Select from "$lib/components/ui/select";
 
-    interface Section {
-        _id: string;
-        name: string;
-        slug: string;
-    }
-
     interface Category {
         _id: string;
         name: string;
@@ -29,7 +23,6 @@
 
     interface Props {
         product?: Partial<v.InferInput<ProductSchema>>;
-        sections: Section[];
         categories: Category[];
         onSave: (data: v.InferOutput<ProductSchema>) => Promise<void>;
         onCancel: () => void;
@@ -38,7 +31,6 @@
 
     let {
         product,
-        sections = [],
         categories = [],
         onSave,
         onCancel,
@@ -49,12 +41,8 @@
     const initialValues = {
         name: "",
         slug: "",
-        description: "",
-        price: 0,
-        sectionSlug: "",
         categoryId: "",
         imageUrl: "",
-        allergens: [] as string[],
     };
 
     // Configuración de Superforms
@@ -130,7 +118,6 @@
     let imagePreview = $state<string | null>(null);
     let isUploading = $state(false);
     let isSubmitting = $state(false);
-    let allergenInput = $state("");
 
     // Sincronización limpia cuando cambie la prop 'product'
     $effect(() => {
@@ -138,12 +125,8 @@
             data: {
                 name: product?.name ?? "",
                 slug: product?.slug ?? "",
-                description: product?.description ?? "",
-                price: typeof product?.price === "number" ? product.price : 0,
-                sectionSlug: product?.sectionSlug ?? "",
                 categoryId: product?.categoryId ?? "",
                 imageUrl: product?.imageUrl ?? "",
-                allergens: product?.allergens ?? [],
             },
         });
         imagePreview = product?.imageUrl ?? null;
@@ -151,11 +134,6 @@
     });
 
     // Labels seleccionados para los Selects de shadcn
-    let selectedSectionLabel = $derived(
-        sections.find(({ slug }) => slug === $formData.sectionSlug)?.name ??
-            "Seleccionar sección",
-    );
-
     let selectedCategoryLabel = $derived(
         categories.find((c) => c._id === $formData.categoryId)?.name ??
             "Seleccionar categoría",
@@ -181,19 +159,6 @@
         imagePreview = null;
         $formData.imageUrl = "";
     }
-
-    // Handlers de Alérgenos
-    function handleAddAllergen() {
-        const trimmed = allergenInput.trim();
-        if (trimmed) {
-            $formData.allergens = [...$formData.allergens, trimmed];
-            allergenInput = "";
-        }
-    }
-
-    function handleRemoveAllergen(index: number) {
-        $formData.allergens = $formData.allergens.filter((_, i) => i !== index);
-    }
 </script>
 
 <form method="POST" use:enhance class="space-y-4">
@@ -204,7 +169,7 @@
             id="name"
             type="text"
             bind:value={$formData.name}
-            placeholder="Ej. Hamburguesa Artesanal"
+            placeholder="Ej. Mortero Grueso"
         />
         {#if $errors.name}
             <p class="text-sm text-destructive">{$errors.name}</p>
@@ -223,58 +188,6 @@
         <p class="text-xs text-muted-foreground">
             Si se deja vacío, se generará automáticamente desde el nombre
         </p>
-    </div>
-
-    <!-- Descripción -->
-    <div class="space-y-2">
-        <Label for="description">Descripción</Label>
-        <Textarea
-            id="description"
-            bind:value={$formData.description}
-            rows={3}
-            placeholder="Detalla los ingredientes o características del producto..."
-        />
-        {#if $errors.description}
-            <p class="text-sm text-destructive">{$errors.description}</p>
-        {/if}
-    </div>
-
-    <!-- Precio -->
-    <div class="space-y-2">
-        <Label for="price">Precio</Label>
-        <Input
-            id="price"
-            type="number"
-            step="0.01"
-            bind:value={$formData.price}
-        />
-        {#if $errors.price}
-            <p class="text-sm text-destructive">{$errors.price}</p>
-        {/if}
-    </div>
-
-    <!-- Sección (shadcn Select) -->
-    <div class="space-y-2">
-        <Label>Sección</Label>
-        <Select.Root
-            type="single"
-            value={$formData.sectionSlug}
-            onValueChange={(v) => ($formData.sectionSlug = v)}
-        >
-            <Select.Trigger class="w-full">
-                {selectedSectionLabel}
-            </Select.Trigger>
-            <Select.Content>
-                {#each sections as section (section.slug)}
-                    <Select.Item value={section.slug} label={section.name}>
-                        {section.name}
-                    </Select.Item>
-                {/each}
-            </Select.Content>
-        </Select.Root>
-        {#if $errors.sectionSlug}
-            <p class="text-sm text-destructive">{$errors.sectionSlug}</p>
-        {/if}
     </div>
 
     <!-- Categoría (shadcn Select) -->
@@ -298,45 +211,6 @@
         </Select.Root>
         {#if $errors.categoryId}
             <p class="text-sm text-destructive">{$errors.categoryId}</p>
-        {/if}
-    </div>
-
-    <!-- Alérgenos -->
-    <div class="space-y-2">
-        <Label for="allergen-input">Alérgenos</Label>
-        <div class="flex gap-2">
-            <Input
-                id="allergen-input"
-                type="text"
-                bind:value={allergenInput}
-                placeholder="Agregar alérgeno"
-                onkeydown={(e) => {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddAllergen();
-                    }
-                }}
-            />
-            <Button type="button" variant="outline" onclick={handleAddAllergen}>
-                <Plus size={16} class="mr-1" /> Agregar
-            </Button>
-        </div>
-
-        {#if $formData.allergens.length > 0}
-            <div class="flex flex-wrap gap-2 pt-1">
-                {#each $formData.allergens as allergen, index}
-                    <Badge variant="secondary" class="gap-1.5 py-1 px-2.5">
-                        {allergen}
-                        <button
-                            type="button"
-                            onclick={() => handleRemoveAllergen(index)}
-                            class="hover:text-destructive transition-colors"
-                        >
-                            <X size={12} />
-                        </button>
-                    </Badge>
-                {/each}
-            </div>
         {/if}
     </div>
 

@@ -45,7 +45,7 @@
 </script>
 
 <svelte:head>
-    <title>Iniciar Sesión - Don Quijote</title>
+    <title>Iniciar Sesión - Ingenio Mat</title>
 </svelte:head>
 
 <main class="min-h-screen flex items-center justify-center bg-background px-4">
@@ -53,9 +53,12 @@
         class="w-full max-w-md rounded-xl border border-border bg-card text-card-foreground shadow-sm"
     >
         <div class="flex flex-col space-y-1.5 p-6 text-center">
-            <h1 class="text-2xl font-bold tracking-widest font-italianno">
-                Don Quijote
-            </h1>
+            <img
+                alt="Ingenio Mat logo"
+                src="/WhatsApp Image 2026-06-18 at 18.35.29.svg"
+                width="200"
+                class="mx-auto"
+            />
             <p class="text-sm text-muted-foreground">
                 Inicia sesión en tu cuenta
             </p>

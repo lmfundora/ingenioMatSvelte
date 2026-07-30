@@ -11,8 +11,10 @@
 import type * as auth from "../auth.js";
 import type * as categories from "../categories.js";
 import type * as http from "../http.js";
+import type * as offers from "../offers.js";
 import type * as products from "../products.js";
-import type * as sections from "../sections.js";
+import type * as serviceTypes from "../serviceTypes.js";
+import type * as services from "../services.js";
 
 import type {
   ApiFromModules,
@@ -24,8 +26,10 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   categories: typeof categories;
   http: typeof http;
+  offers: typeof offers;
   products: typeof products;
-  sections: typeof sections;
+  serviceTypes: typeof serviceTypes;
+  services: typeof services;
 }>;
 
 /**

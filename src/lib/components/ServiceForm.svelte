@@ -7,6 +7,7 @@
     import { useQuery, useMutation } from "convex-svelte";
     import { api } from "$convex/_generated/api";
     import { ImagePlus, X } from "@lucide/svelte";
+    import { optimizeImage, createPreviewUrl, revokePreviewUrl } from "$lib/utils/imageOptimizer";
 
     interface Service {
         _id?: Id<"services">;
@@ -46,81 +47,153 @@
 
     let isSubmitting = $state(false);
     let isUploading = $state(false);
-    let isUploadingExamples = $state(false);
     let fileInput: HTMLInputElement;
     let exampleImagesInput: HTMLInputElement;
+    let imageFile = $state<File | null>(null);
     let previewUrl = $state(service?.imageUrl ?? "");
-    let examplePreviewUrls = $state<string[]>(service?.fotosDeEjemplos ?? []);
+    let exampleImageFiles = $state<File[]>([]);
+    let examplePreviewUrls = $state<string[]>([]);
 
-    async function handleImageUpload(e: Event) {
+    // Cleanup al destruir el componente
+    $effect(() => {
+        return () => {
+            if (previewUrl && !previewUrl.startsWith('http')) {
+                revokePreviewUrl(previewUrl);
+            }
+            examplePreviewUrls.forEach(url => {
+                if (url && !url.startsWith('http')) {
+                    revokePreviewUrl(url);
+                }
+            });
+        };
+    });
+
+    function handleImageUpload(e: Event) {
         const input = e.target as HTMLInputElement;
         const file = input.files?.[0];
         if (!file) return;
 
-        previewUrl = URL.createObjectURL(file);
-        isUploading = true;
-        try {
-            const uploadUrl = await generateUploadUrl({});
-            const result = await fetch(uploadUrl, {
-                method: "POST",
-                headers: { "Content-Type": file.type },
-                body: file,
-            });
-            const { storageId } = await result.json();
-            formData.imageUrl = storageId;
-        } catch (error) {
-            console.error("Error al subir imagen:", error);
-        } finally {
-            isUploading = false;
+        // Limpiar preview anterior si existe
+        if (previewUrl && !previewUrl.startsWith('http')) {
+            revokePreviewUrl(previewUrl);
         }
+
+        imageFile = file;
+        previewUrl = createPreviewUrl(file);
+        formData.imageUrl = "pending";
     }
 
-    async function handleExampleImagesUpload(e: Event) {
+    function handleExampleImagesUpload(e: Event) {
         const input = e.target as HTMLInputElement;
         const files = input.files;
         if (!files || files.length === 0) return;
 
-        isUploadingExamples = true;
-        try {
-            const uploadPromises = Array.from(files).map(async (file) => {
-                const uploadUrl = await generateUploadUrl({});
-                const result = await fetch(uploadUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": file.type },
-                    body: file,
-                });
-                const { storageId } = await result.json();
-                return storageId;
-            });
+        Array.from(files).forEach((file) => {
+            exampleImageFiles = [...exampleImageFiles, file];
+            const previewUrl = createPreviewUrl(file);
+            examplePreviewUrls = [...examplePreviewUrls, previewUrl];
+        });
 
-            const storageIds = await Promise.all(uploadPromises);
-            formData.fotosDeEjemplos = [...(formData.fotosDeEjemplos || []), ...storageIds];
-            
-            // Add preview URLs
-            const newPreviews = Array.from(files).map(file => URL.createObjectURL(file));
-            examplePreviewUrls = [...examplePreviewUrls, ...newPreviews];
-        } catch (error) {
-            console.error("Error al subir imágenes de ejemplo:", error);
-        } finally {
-            isUploadingExamples = false;
-            if (exampleImagesInput) {
-                exampleImagesInput.value = "";
-            }
+        if (exampleImagesInput) {
+            exampleImagesInput.value = "";
         }
     }
 
     function removeExampleImage(index: number) {
-        formData.fotosDeEjemplos = formData.fotosDeEjemplos?.filter((_, i) => i !== index) || [];
+        // Limpiar la URL del preview
+        if (examplePreviewUrls[index] && !examplePreviewUrls[index].startsWith('http')) {
+            revokePreviewUrl(examplePreviewUrls[index]);
+        }
+        
+        exampleImageFiles = exampleImageFiles.filter((_, i) => i !== index);
         examplePreviewUrls = examplePreviewUrls.filter((_, i) => i !== index);
+    }
+
+    function removeMainImage() {
+        if (previewUrl && !previewUrl.startsWith('http')) {
+            revokePreviewUrl(previewUrl);
+        }
+        imageFile = null;
+        previewUrl = "";
+        formData.imageUrl = "";
     }
 
     async function handleSubmit(e: Event) {
         e.preventDefault();
         isSubmitting = true;
+        isUploading = true;
+        
         try {
-            await onSave({ ...formData });
+            let finalImageUrl = formData.imageUrl;
+            let finalExamplePhotos: string[] = [];
+
+            // Cargar imagen principal si existe un archivo local
+            if (imageFile) {
+                try {
+                    const optimizedImage = await optimizeImage(imageFile, 0.8, 1200);
+
+                    const uploadUrl = await generateUploadUrl({});
+                    const response = await fetch(uploadUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": optimizedImage.type,
+                        },
+                        body: optimizedImage,
+                    });
+
+                    if (!response.ok)
+                        throw new Error("Error al subir la imagen principal");
+
+                    const { storageId } = await response.json();
+                    finalImageUrl = storageId;
+                } catch (err) {
+                    console.error("Error al procesar la imagen principal:", err);
+                    throw new Error("Error al procesar la imagen principal");
+                }
+            }
+
+            // Cargar fotos de ejemplo si existen archivos locales
+            if (exampleImageFiles.length > 0) {
+                try {
+                    const uploadPromises = exampleImageFiles.map(async (file) => {
+                        const optimizedImage = await optimizeImage(file, 0.8, 800);
+                        const uploadUrl = await generateUploadUrl({});
+                        const response = await fetch(uploadUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": optimizedImage.type,
+                            },
+                            body: optimizedImage,
+                        });
+
+                        if (!response.ok)
+                            throw new Error("Error al subir foto de ejemplo");
+
+                        const { storageId } = await response.json();
+                        return storageId;
+                    });
+
+                    finalExamplePhotos = await Promise.all(uploadPromises);
+                } catch (err) {
+                    console.error("Error al procesar las fotos de ejemplo:", err);
+                    throw new Error("Error al procesar las fotos de ejemplo");
+                }
+            }
+
+            // Combinar fotos de ejemplo existentes con las nuevas
+            const allExamplePhotos = [
+                ...(formData.fotosDeEjemplos || []),
+                ...finalExamplePhotos
+            ];
+
+            await onSave({ 
+                ...formData, 
+                imageUrl: finalImageUrl,
+                fotosDeEjemplos: allExamplePhotos
+            });
         } finally {
             isSubmitting = false;
+            isUploading = false;
         }
     }
 </script>
@@ -238,10 +311,7 @@
                     <button
                         type="button"
                         class="absolute top-1 right-1 bg-black/50 p-1 rounded-full text-white hover:bg-black/70"
-                        onclick={() => {
-                            formData.imageUrl = "";
-                            previewUrl = "";
-                        }}
+                        onclick={removeMainImage}
                     >
                         <X size={14} />
                     </button>
@@ -255,7 +325,7 @@
                 >
                     <ImagePlus size={24} class="mb-1" />
                     <span class="text-[10px]">
-                        {isUploading ? "Subiendo..." : "Subir imagen"}
+                        {isUploading ? "Procesando..." : "Subir imagen"}
                     </span>
                 </button>
             {/if}
@@ -272,21 +342,9 @@
                 class="hidden"
                 bind:this={exampleImagesInput}
                 onchange={handleExampleImagesUpload}
-                disabled={isUploadingExamples || isSubmitting}
+                disabled={isUploading || isSubmitting}
             />
             
-            <button
-                type="button"
-                onclick={() => exampleImagesInput.click()}
-                disabled={isUploadingExamples || isSubmitting}
-                class="w-full py-3 px-4 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors flex items-center justify-center gap-2"
-            >
-                <ImagePlus size={20} />
-                <span>
-                    {isUploadingExamples ? "Subiendo imágenes..." : "Agregar fotos de ejemplos"}
-                </span>
-            </button>
-
             {#if examplePreviewUrls.length > 0}
                 <div class="grid grid-cols-4 gap-2">
                     {#each examplePreviewUrls as url, index}
@@ -307,14 +365,32 @@
                     {/each}
                 </div>
             {/if}
+            
+            {#if formData.fotosDeEjemplos && formData.fotosDeEjemplos.length > 0}
+                <p class="text-xs text-muted-foreground">
+                    +{formData.fotosDeEjemplos.length} fotos existentes se mantendrán
+                </p>
+            {/if}
+            
+            <button
+                type="button"
+                onclick={() => exampleImagesInput.click()}
+                disabled={isUploading || isSubmitting}
+                class="w-full py-3 px-4 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors flex items-center justify-center gap-2"
+            >
+                <ImagePlus size={20} />
+                <span>
+                    {isUploading ? "Procesando..." : "Agregar fotos de ejemplos"}
+                </span>
+            </button>
         </div>
     </div>
 
     <div class="flex justify-end gap-3 pt-4">
-        <Button variant="outline" type="button" onclick={onClose} disabled={isSubmitting || isUploading || isUploadingExamples}>
+        <Button variant="outline" type="button" onclick={onClose} disabled={isSubmitting || isUploading}>
             Cancelar
         </Button>
-        <Button type="submit" disabled={isSubmitting || isUploading || isUploadingExamples || !formData.imageUrl}>
+        <Button type="submit" disabled={isSubmitting || isUploading || !formData.imageUrl}>
             {isSubmitting ? "Guardando..." : "Guardar"}
         </Button>
     </div>

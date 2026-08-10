@@ -6,7 +6,7 @@
 
     import { toast } from "$lib/toast";
     import { productSchema, type ProductSchema } from "$lib/schemas/product";
-    import { optimizeImage } from "$lib/image-utils";
+    import { optimizeImage, createPreviewUrl, revokePreviewUrl } from "$lib/utils/imageOptimizer";
 
     // Componentes UI de shadcn-svelte
     import { Button } from "$lib/components/ui/button";
@@ -60,16 +60,13 @@
             isSubmitting = true;
             try {
                 let finalImageUrl = f.data.imageUrl;
+                let finalExamplePhotos: string[] = [];
 
-                // Carga de imagen si existe un archivo local
+                // Carga de imagen principal si existe un archivo local
                 if (imageFile) {
                     isUploading = true;
                     try {
-                        const optimizedImage = await optimizeImage(imageFile, {
-                            maxWidth: 1200,
-                            quality: 0.8,
-                            format: "webp",
-                        });
+                        const optimizedImage = await optimizeImage(imageFile, 0.8, 1200);
 
                         const uploadUrl = await generateUploadUrl({});
                         const response = await fetch(uploadUrl, {
@@ -85,15 +82,52 @@
 
                         const { storageId } = await response.json();
                         finalImageUrl = storageId;
-                        toast.success("Imagen subida correctamente");
                     } catch (err) {
-                        toast.error("Error al procesar la imagen");
+                        toast.error("Error al procesar la imagen principal");
                         console.error(err);
                         return;
                     } finally {
                         isUploading = false;
                     }
                 }
+
+                // Carga de fotos de ejemplo si existen archivos locales
+                if (examplePhotoFiles.length > 0) {
+                    isUploading = true;
+                    try {
+                        const uploadPromises = examplePhotoFiles.map(async (file) => {
+                            const optimizedImage = await optimizeImage(file, 0.8, 800);
+                            const uploadUrl = await generateUploadUrl({});
+                            const response = await fetch(uploadUrl, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": optimizedImage.type,
+                                },
+                                body: optimizedImage,
+                            });
+
+                            if (!response.ok)
+                                throw new Error("Error al subir foto de ejemplo");
+
+                            const { storageId } = await response.json();
+                            return storageId;
+                        });
+
+                        finalExamplePhotos = await Promise.all(uploadPromises);
+                    } catch (err) {
+                        toast.error("Error al procesar las fotos de ejemplo");
+                        console.error(err);
+                        return;
+                    } finally {
+                        isUploading = false;
+                    }
+                }
+
+                // Combinar fotos de ejemplo existentes con las nuevas
+                const allExamplePhotos = [
+                    ...(f.data.fotosDeEjemplos || []),
+                    ...finalExamplePhotos
+                ];
 
                 // Slug automático
                 const finalSlug =
@@ -109,7 +143,7 @@
                     ...f.data,
                     imageUrl: finalImageUrl,
                     slug: finalSlug,
-                    fotosDeEjemplos: f.data.fotosDeEjemplos || [],
+                    fotosDeEjemplos: allExamplePhotos,
                 });
             } finally {
                 isSubmitting = false;
@@ -127,25 +161,37 @@
     let examplePhotoFiles = $state<File[]>([]);
     let examplePhotoPreviews = $state<string[]>([]);
 
-    // Sincronización limpia cuando cambie la prop 'product'
+    // Inicializar el formulario con los datos del producto
+    reset({
+        data: {
+            name: product?.name ?? "",
+            slug: product?.slug ?? "",
+            categoryId: product?.categoryId ?? "",
+            imageUrl: product?.imageUrl ?? "",
+            usos: product?.usos ?? "",
+            preparacion: product?.preparacion ?? "",
+            actividad: product?.actividad ?? "",
+            medidas: product?.medidas ?? "",
+            fotosDeEjemplos: product?.fotosDeEjemplos ?? [],
+        },
+    });
+    imagePreview = product?.imageUrl ?? null;
+    imageFile = null;
+    examplePhotoFiles = [];
+    examplePhotoPreviews = [];
+
+    // Cleanup al destruir el componente
     $effect(() => {
-        reset({
-            data: {
-                name: product?.name ?? "",
-                slug: product?.slug ?? "",
-                categoryId: product?.categoryId ?? "",
-                imageUrl: product?.imageUrl ?? "",
-                usos: product?.usos ?? "",
-                preparacion: product?.preparacion ?? "",
-                actividad: product?.actividad ?? "",
-                medidas: product?.medidas ?? "",
-                fotosDeEjemplos: product?.fotosDeEjemplos ?? [],
-            },
-        });
-        imagePreview = product?.imageUrl ?? null;
-        imageFile = null;
-        examplePhotoFiles = [];
-        examplePhotoPreviews = [];
+        return () => {
+            if (imagePreview && !imagePreview.startsWith('http')) {
+                revokePreviewUrl(imagePreview);
+            }
+            examplePhotoPreviews.forEach(url => {
+                if (url && !url.startsWith('http')) {
+                    revokePreviewUrl(url);
+                }
+            });
+        };
     });
 
     // Labels seleccionados para los Selects de shadcn
@@ -159,63 +205,48 @@
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
         if (file) {
+            // Limpiar preview anterior si existe
+            if (imagePreview && !imagePreview.startsWith('http')) {
+                revokePreviewUrl(imagePreview);
+            }
+            
             imageFile = file;
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                imagePreview = reader.result as string;
-            };
-            reader.readAsDataURL(file);
+            imagePreview = createPreviewUrl(file);
             $formData.imageUrl = "pending";
         }
     }
 
     function handleRemoveImage() {
+        if (imagePreview && !imagePreview.startsWith('http')) {
+            revokePreviewUrl(imagePreview);
+        }
         imageFile = null;
         imagePreview = null;
         $formData.imageUrl = "";
     }
 
-    async function handleExamplePhotoChange(e: Event) {
+    function handleExamplePhotoChange(e: Event) {
         const target = e.target as HTMLInputElement;
-        const file = target.files?.[0];
-        if (file) {
-            try {
-                isUploading = true;
-                const optimizedImage = await optimizeImage(file, {
-                    maxWidth: 800,
-                    quality: 0.8,
-                    format: "webp",
-                });
-
-                const uploadUrl = await generateUploadUrl({});
-                const response = await fetch(uploadUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": optimizedImage.type,
-                    },
-                    body: optimizedImage,
-                });
-
-                if (!response.ok)
-                    throw new Error("Error al subir la foto de ejemplo");
-
-                const { storageId } = await response.json();
-                
-                // Add to the fotosDeEjemplos array
-                if (!$formData.fotosDeEjemplos) {
-                    $formData.fotosDeEjemplos = [];
-                }
-                $formData.fotosDeEjemplos = [...$formData.fotosDeEjemplos, storageId];
-                toast.success("Foto de ejemplo subida correctamente");
-            } catch (err) {
-                toast.error("Error al procesar la foto de ejemplo");
-                console.error(err);
-            } finally {
-                isUploading = false;
-            }
+        const files = target.files;
+        if (files && files.length > 0) {
+            Array.from(files).forEach((file) => {
+                examplePhotoFiles = [...examplePhotoFiles, file];
+                const previewUrl = createPreviewUrl(file);
+                examplePhotoPreviews = [...examplePhotoPreviews, previewUrl];
+            });
         }
         // Reset the input
         target.value = "";
+    }
+
+    function handleRemoveExamplePhoto(index: number) {
+        // Limpiar la URL del preview
+        if (examplePhotoPreviews[index] && !examplePhotoPreviews[index].startsWith('http')) {
+            revokePreviewUrl(examplePhotoPreviews[index]);
+        }
+        
+        examplePhotoFiles = examplePhotoFiles.filter((_, i) => i !== index);
+        examplePhotoPreviews = examplePhotoPreviews.filter((_, i) => i !== index);
     }
 </script>
 
@@ -378,9 +409,9 @@
         <div class="space-y-2">
             <Label>Fotos de Ejemplos</Label>
             <div class="space-y-2">
-                {#if $formData.fotosDeEjemplos && $formData.fotosDeEjemplos.length > 0}
+                {#if examplePhotoPreviews.length > 0}
                     <div class="grid grid-cols-3 gap-2">
-                        {#each $formData.fotosDeEjemplos as photoUrl, index}
+                        {#each examplePhotoPreviews as photoUrl, index}
                             <div class="relative aspect-square rounded-lg overflow-hidden bg-muted border border-border">
                                 <img
                                     src={photoUrl}
@@ -391,9 +422,7 @@
                                     type="button"
                                     variant="destructive"
                                     size="icon"
-                                    onclick={() => {
-                                        $formData.fotosDeEjemplos = $formData.fotosDeEjemplos.filter((_, i) => i !== index);
-                                    }}
+                                    onclick={() => handleRemoveExamplePhoto(index)}
                                     class="absolute top-1 right-1 h-6 w-6"
                                 >
                                     <X size={12} />
@@ -401,6 +430,12 @@
                             </div>
                         {/each}
                     </div>
+                {/if}
+                
+                {#if $formData.fotosDeEjemplos && $formData.fotosDeEjemplos.length > 0}
+                    <p class="text-xs text-muted-foreground">
+                        +{$formData.fotosDeEjemplos.length} fotos existentes se mantendrán
+                    </p>
                 {/if}
                 
                 <div
@@ -417,6 +452,7 @@
                         id="example-photos-upload"
                         type="file"
                         accept="image/*"
+                        multiple
                         onchange={handleExamplePhotoChange}
                         class="hidden"
                     />

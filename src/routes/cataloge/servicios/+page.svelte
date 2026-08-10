@@ -19,13 +19,19 @@
     // Servicios filtrados
     let filteredServices = $derived.by(() => {
         if (!data.services) return [];
-        
+
         return data.services.filter((service: Doc<"services">) => {
-            const matchesSearch = searchQuery === "" || 
-                service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                service.description.toLowerCase().includes(searchQuery.toLowerCase());
-            
-            const matchesCategory = filterCategory === "" || 
+            const matchesSearch =
+                searchQuery === "" ||
+                service.name
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase()) ||
+                service.description
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase());
+
+            const matchesCategory =
+                filterCategory === "" ||
                 service.serviceTypeId === filterCategory;
 
             return matchesSearch && matchesCategory;
@@ -33,14 +39,18 @@
     });
 
     // Helper para obtener nombre del tipo de servicio
-    function getServiceTypeName(typeId: Id<"serviceTypes"> | string | null | undefined): string {
+    function getServiceTypeName(
+        typeId: Id<"serviceTypes"> | string | null | undefined,
+    ): string {
         if (!typeId || !data.serviceTypes) return "Sin clasificar";
         const type = data.serviceTypes.find((t) => t._id === typeId);
         return type?.name || "Sin clasificar";
     }
 
     // Verificar si hay filtros activos
-    let hasActiveFilters = $derived(searchQuery !== "" || filterCategory !== "");
+    let hasActiveFilters = $derived(
+        searchQuery !== "" || filterCategory !== "",
+    );
 
     // Limpiar filtros
     function clearFilters() {
@@ -96,12 +106,11 @@
         {/if}
     </div>
 {:else}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    >
         {#each filteredServices as service (service._id)}
-            <ServiceCardCustomer
-                {service}
-                {getServiceTypeName}
-            />
+            <ServiceCardCustomer {service} {getServiceTypeName} />
         {/each}
     </div>
 

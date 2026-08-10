@@ -124,13 +124,15 @@
                     Líderes en construcción civil. Llevamos tu proyecto de
                     principio a fin con calidad y autonomía.
                 </p>
-                <Button
-                    size="lg"
-                    color="primary"
-                    class="text-primary-foreground"
-                >
-                    Explorar
-                </Button>
+                <a href="/cataloge">
+                    <Button
+                        size="lg"
+                        color="primary"
+                        class="text-primary-foreground"
+                    >
+                        Explorar
+                    </Button>
+                </a>
             </div>
         </div>
 

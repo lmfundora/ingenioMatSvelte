@@ -1,5 +1,7 @@
 <script lang="ts">
     import { ChevronRight, Package, Wrench } from "@lucide/svelte";
+
+    import Footer from "$lib/components/landing/Footer.svelte";
 </script>
 
 <svelte:head>
@@ -106,3 +108,4 @@
         </div>
     </div>
 </section>
+<Footer />

@@ -14,12 +14,18 @@
         description: string;
         imageUrl: string;
         serviceTypeId: Id<"serviceTypes">;
+        detalles?: string;
+        fotosDeEjemplos?: string[];
+        precioBase?: string;
+        duracionEstimada?: string;
+        areaDeCobertura?: string;
+        requisitos?: string;
     }
 
     let { service, onClose, onSave } = $props<{
         service: Service | null;
         onClose: () => void;
-        onSave: (data: { name: string; description: string; imageUrl: string; serviceTypeId: Id<"serviceTypes"> }) => Promise<void>;
+        onSave: (data: { name: string; description: string; imageUrl: string; serviceTypeId: Id<"serviceTypes">; detalles?: string; fotosDeEjemplos?: string[]; precioBase?: string; duracionEstimada?: string; areaDeCobertura?: string; requisitos?: string }) => Promise<void>;
     }>();
 
     let serviceTypesQuery = useQuery(api.serviceTypes.list, {});
@@ -30,12 +36,21 @@
         description: service?.description ?? "",
         imageUrl: service?.imageUrl ?? "",
         serviceTypeId: service?.serviceTypeId ?? ("" as Id<"serviceTypes">),
+        detalles: service?.detalles ?? "",
+        fotosDeEjemplos: service?.fotosDeEjemplos ?? [],
+        precioBase: service?.precioBase ?? "",
+        duracionEstimada: service?.duracionEstimada ?? "",
+        areaDeCobertura: service?.areaDeCobertura ?? "",
+        requisitos: service?.requisitos ?? "",
     });
 
     let isSubmitting = $state(false);
     let isUploading = $state(false);
+    let isUploadingExamples = $state(false);
     let fileInput: HTMLInputElement;
+    let exampleImagesInput: HTMLInputElement;
     let previewUrl = $state(service?.imageUrl ?? "");
+    let examplePreviewUrls = $state<string[]>(service?.fotosDeEjemplos ?? []);
 
     async function handleImageUpload(e: Event) {
         const input = e.target as HTMLInputElement;
@@ -58,6 +73,45 @@
         } finally {
             isUploading = false;
         }
+    }
+
+    async function handleExampleImagesUpload(e: Event) {
+        const input = e.target as HTMLInputElement;
+        const files = input.files;
+        if (!files || files.length === 0) return;
+
+        isUploadingExamples = true;
+        try {
+            const uploadPromises = Array.from(files).map(async (file) => {
+                const uploadUrl = await generateUploadUrl({});
+                const result = await fetch(uploadUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": file.type },
+                    body: file,
+                });
+                const { storageId } = await result.json();
+                return storageId;
+            });
+
+            const storageIds = await Promise.all(uploadPromises);
+            formData.fotosDeEjemplos = [...(formData.fotosDeEjemplos || []), ...storageIds];
+            
+            // Add preview URLs
+            const newPreviews = Array.from(files).map(file => URL.createObjectURL(file));
+            examplePreviewUrls = [...examplePreviewUrls, ...newPreviews];
+        } catch (error) {
+            console.error("Error al subir imágenes de ejemplo:", error);
+        } finally {
+            isUploadingExamples = false;
+            if (exampleImagesInput) {
+                exampleImagesInput.value = "";
+            }
+        }
+    }
+
+    function removeExampleImage(index: number) {
+        formData.fotosDeEjemplos = formData.fotosDeEjemplos?.filter((_, i) => i !== index) || [];
+        examplePreviewUrls = examplePreviewUrls.filter((_, i) => i !== index);
     }
 
     async function handleSubmit(e: Event) {
@@ -113,6 +167,56 @@
     </div>
 
     <div class="space-y-2">
+        <Label for="detalles">Detalles Adicionales</Label>
+        <Textarea
+            id="detalles"
+            bind:value={formData.detalles}
+            placeholder="Información adicional específica del servicio..."
+            disabled={isSubmitting}
+        />
+    </div>
+
+    <div class="space-y-2">
+        <Label for="precioBase">Precio Base</Label>
+        <Input
+            id="precioBase"
+            bind:value={formData.precioBase}
+            placeholder="Ej: $500.00"
+            disabled={isSubmitting}
+        />
+    </div>
+
+    <div class="space-y-2">
+        <Label for="duracionEstimada">Duración Estimada</Label>
+        <Input
+            id="duracionEstimada"
+            bind:value={formData.duracionEstimada}
+            placeholder="Ej: 2-3 horas, 1 día, etc."
+            disabled={isSubmitting}
+        />
+    </div>
+
+    <div class="space-y-2">
+        <Label for="areaDeCobertura">Área de Cobertura</Label>
+        <Input
+            id="areaDeCobertura"
+            bind:value={formData.areaDeCobertura}
+            placeholder="Ej: Ciudad de México, Zona Metropolitana, etc."
+            disabled={isSubmitting}
+        />
+    </div>
+
+    <div class="space-y-2">
+        <Label for="requisitos">Requisitos</Label>
+        <Textarea
+            id="requisitos"
+            bind:value={formData.requisitos}
+            placeholder="Requisitos previos necesarios para el servicio..."
+            disabled={isSubmitting}
+        />
+    </div>
+
+    <div class="space-y-2">
         <Label>Imagen del servicio</Label>
         <div class="flex items-center gap-4">
             <input
@@ -158,11 +262,59 @@
         </div>
     </div>
 
+    <div class="space-y-2">
+        <Label>Fotos de Ejemplos</Label>
+        <div class="space-y-3">
+            <input
+                type="file"
+                accept="image/*"
+                multiple
+                class="hidden"
+                bind:this={exampleImagesInput}
+                onchange={handleExampleImagesUpload}
+                disabled={isUploadingExamples || isSubmitting}
+            />
+            
+            <button
+                type="button"
+                onclick={() => exampleImagesInput.click()}
+                disabled={isUploadingExamples || isSubmitting}
+                class="w-full py-3 px-4 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-colors flex items-center justify-center gap-2"
+            >
+                <ImagePlus size={20} />
+                <span>
+                    {isUploadingExamples ? "Subiendo imágenes..." : "Agregar fotos de ejemplos"}
+                </span>
+            </button>
+
+            {#if examplePreviewUrls.length > 0}
+                <div class="grid grid-cols-4 gap-2">
+                    {#each examplePreviewUrls as url, index}
+                        <div class="relative aspect-square rounded-lg overflow-hidden border border-border">
+                            <img
+                                src={url}
+                                alt="Example {index + 1}"
+                                class="w-full h-full object-cover"
+                            />
+                            <button
+                                type="button"
+                                class="absolute top-1 right-1 bg-black/50 p-1 rounded-full text-white hover:bg-black/70"
+                                onclick={() => removeExampleImage(index)}
+                            >
+                                <X size={12} />
+                            </button>
+                        </div>
+                    {/each}
+                </div>
+            {/if}
+        </div>
+    </div>
+
     <div class="flex justify-end gap-3 pt-4">
-        <Button variant="outline" type="button" onclick={onClose} disabled={isSubmitting || isUploading}>
+        <Button variant="outline" type="button" onclick={onClose} disabled={isSubmitting || isUploading || isUploadingExamples}>
             Cancelar
         </Button>
-        <Button type="submit" disabled={isSubmitting || isUploading || !formData.imageUrl}>
+        <Button type="submit" disabled={isSubmitting || isUploading || isUploadingExamples || !formData.imageUrl}>
             {isSubmitting ? "Guardando..." : "Guardar"}
         </Button>
     </div>

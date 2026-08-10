@@ -1,7 +1,16 @@
 <script lang="ts">
     import type { PageData } from "./$types";
     import { Badge } from "$lib/components/ui/badge/index.js";
-    import { Wrench, ArrowLeft, ShieldCheck, Clock } from "@lucide/svelte";
+    import {
+        Wrench,
+        ArrowLeft,
+        ShieldCheck,
+        Clock,
+        DollarSign,
+        MapPin,
+        ClipboardList,
+        Image as ImageIcon,
+    } from "@lucide/svelte";
 
     let { data }: { data: PageData } = $props();
     let service = $derived(data.service);
@@ -64,46 +73,117 @@
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6">
-                    <div class="flex items-start gap-3">
-                        <div
-                            class="bg-primary/10 p-2 rounded-full text-primary shrink-0"
-                        >
-                            <ShieldCheck size={20} />
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-sm">
-                                Profesionales expertos
-                            </h4>
-                            <p class="text-xs text-muted-foreground mt-1">
-                                Personal altamente calificado
-                            </p>
-                        </div>
+                {#if service.detalles}
+                    <div class="pt-6 border-t border-border">
+                        <h3 class="font-semibold text-lg mb-3">
+                            Detalles Adicionales
+                        </h3>
+                        <p class="text-muted-foreground leading-relaxed">
+                            {service.detalles}
+                        </p>
                     </div>
-                    <div class="flex items-start gap-3">
-                        <div
-                            class="bg-primary/10 p-2 rounded-full text-primary shrink-0"
-                        >
-                            <Clock size={20} />
+                {/if}
+
+                <!-- Información adicional del servicio -->
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-border"
+                >
+                    {#if service.precioBase}
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="bg-primary/10 p-2 rounded-full text-primary shrink-0"
+                            >
+                                <DollarSign size={20} />
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-sm">Precio Base</h4>
+                                <p class="text-xs text-muted-foreground mt-1">
+                                    {service.precioBase}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="font-medium text-sm">
-                                Ejecución a tiempo
-                            </h4>
-                            <p class="text-xs text-muted-foreground mt-1">
-                                Cumplimos los plazos acordados
-                            </p>
+                    {/if}
+
+                    {#if service.duracionEstimada}
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="bg-primary/10 p-2 rounded-full text-primary shrink-0"
+                            >
+                                <Clock size={20} />
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-sm">
+                                    Duración Estimada
+                                </h4>
+                                <p class="text-xs text-muted-foreground mt-1">
+                                    {service.duracionEstimada}
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    {/if}
+
+                    {#if service.areaDeCobertura}
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="bg-primary/10 p-2 rounded-full text-primary shrink-0"
+                            >
+                                <MapPin size={20} />
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-sm">
+                                    Área de Cobertura
+                                </h4>
+                                <p class="text-xs text-muted-foreground mt-1">
+                                    {service.areaDeCobertura}
+                                </p>
+                            </div>
+                        </div>
+                    {/if}
+
+                    {#if service.requisitos}
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="bg-primary/10 p-2 rounded-full text-primary shrink-0"
+                            >
+                                <ClipboardList size={20} />
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-sm">Requisitos</h4>
+                                <p class="text-xs text-muted-foreground mt-1">
+                                    {service.requisitos}
+                                </p>
+                            </div>
+                        </div>
+                    {/if}
                 </div>
+
+                <!-- Fotos de ejemplos -->
+                {#if service.fotosDeEjemplos && service.fotosDeEjemplos.length > 0}
+                    <div class="pt-6 border-t border-border">
+                        <h3
+                            class="font-semibold text-lg mb-3 flex items-center gap-2"
+                        >
+                            <ImageIcon size={20} />
+                            Ejemplos de Trabajos Realizados
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {#each service.fotosDeEjemplos as exampleUrl}
+                                <div
+                                    class="aspect-square rounded-lg overflow-hidden border border-border"
+                                >
+                                    <img
+                                        src={exampleUrl}
+                                        alt="Ejemplo de trabajo"
+                                        class="w-full h-full object-cover hover:scale-105 transition-transform"
+                                    />
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
             </div>
 
             <div class="mt-10 pt-8 border-t border-border">
-                <button
-                    class="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 font-medium py-3 px-8 rounded-full transition-colors flex items-center justify-center gap-2"
-                >
-                    Solicitar Cotización de Servicio
-                </button>
                 <p
                     class="text-xs text-center sm:text-left text-muted-foreground mt-4"
                 >

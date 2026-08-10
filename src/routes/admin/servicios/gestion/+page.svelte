@@ -1,20 +1,14 @@
 <script lang="ts">
-    import { Plus, Edit, Trash2 } from "@lucide/svelte";
+    import { Plus } from "@lucide/svelte";
     import { Button } from "$lib/components/ui/button/index.js";
-    import * as Card from "$lib/components/ui/card/index.js";
     import { toast } from "$lib/toast";
     import ServiceForm from "$lib/components/ServiceForm.svelte";
+    import ServiceCard from "$lib/components/ServiceCard.svelte";
     import { useQuery, useMutation } from "convex-svelte";
     import { api } from "$convex/_generated/api";
-    import type { Id } from "$convex/_generated/dataModel";
+    import type { Id, Doc } from "$convex/_generated/dataModel";
 
-    interface Service {
-        _id: Id<"services">;
-        name: string;
-        description: string;
-        imageUrl: string;
-        serviceTypeId: Id<"serviceTypes">;
-    }
+    type Service = Doc<"services">;
 
     const servicesQuery = useQuery(api.services.list, {});
     const serviceTypesQuery = useQuery(api.serviceTypes.list, {});
@@ -92,50 +86,12 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {#if servicesQuery.data}
                     {#each servicesQuery.data as service (service._id)}
-                        <Card.Root class="flex flex-col justify-between overflow-hidden">
-                            {#if service.imageUrl}
-                                <div class="w-full h-48 bg-muted">
-                                    <img 
-                                        src={service.imageUrl} 
-                                        alt={service.name}
-                                        class="w-full h-full object-cover"
-                                    />
-                                </div>
-                            {/if}
-                            <Card.Header>
-                                <div class="flex items-center justify-between gap-2 mb-2">
-                                    <span class="text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full">
-                                        {getServiceTypeName(service.serviceTypeId)}
-                                    </span>
-                                </div>
-                                <Card.Title>{service.name}</Card.Title>
-                                <Card.Description class="line-clamp-2 mt-2">
-                                    {service.description}
-                                </Card.Description>
-                            </Card.Header>
-                            <Card.Footer
-                                class="flex gap-2 justify-between border-t border-border/40 pt-3 mt-auto"
-                            >
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onclick={() => handleEdit(service)}
-                                    class="gap-1.5"
-                                >
-                                    <Edit size={16} />
-                                    Editar
-                                </Button>
-                                <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onclick={() => handleDelete(service._id)}
-                                    class="gap-1.5"
-                                >
-                                    <Trash2 size={16} />
-                                    Eliminar
-                                </Button>
-                            </Card.Footer>
-                        </Card.Root>
+                        <ServiceCard
+                            {service}
+                            {getServiceTypeName}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                        />
                     {/each}
                 {/if}
             </div>

@@ -34,12 +34,46 @@ async function resolveProductImage(ctx: QueryCtx, product: Doc<"products">) {
   }
 }
 
+// Helper para resolver las URLs de las fotos de ejemplo
+async function resolveExamplePhotos(ctx: QueryCtx, product: Doc<"products">) {
+  if (!product.fotosDeEjemplos || product.fotosDeEjemplos.length === 0) {
+    return product;
+  }
+
+  try {
+    const resolvedPhotos = await Promise.all(
+      product.fotosDeEjemplos.map(async (photoId) => {
+        let cleanId = photoId.trim();
+        if (cleanId.startsWith("http")) {
+          cleanId = cleanId.split("/api/storage/")[1] || cleanId;
+        }
+        const url = await ctx.storage.getUrl(cleanId as any);
+        return url ?? null;
+      })
+    );
+
+    return {
+      ...product,
+      fotosDeEjemplos: resolvedPhotos.filter((url): url is string => url !== null)
+    };
+  } catch (error) {
+    console.error(
+      `[Convex] Error resolviendo fotos de ejemplo:`,
+      error,
+    );
+    return product;
+  }
+}
+
 export const list = query({
   args: {},
   handler: async (ctx) => {
     const products = await ctx.db.query("products").collect();
     return await Promise.all(
-      products.map((product) => resolveProductImage(ctx, product)),
+      products.map(async (product) => {
+        const withMainImage = await resolveProductImage(ctx, product);
+        return await resolveExamplePhotos(ctx, withMainImage);
+      }),
     );
   },
 });
@@ -49,7 +83,8 @@ export const getById = query({
   handler: async (ctx, args) => {
     const product = await ctx.db.get(args.id);
     if (!product) return null;
-    return await resolveProductImage(ctx, product);
+    const withMainImage = await resolveProductImage(ctx, product);
+    return await resolveExamplePhotos(ctx, withMainImage);
   },
 });
 
@@ -62,7 +97,8 @@ export const getBySlug = query({
       .first();
 
     if (!product) return null;
-    return await resolveProductImage(ctx, product);
+    const withMainImage = await resolveProductImage(ctx, product);
+    return await resolveExamplePhotos(ctx, withMainImage);
   },
 });
 
@@ -72,6 +108,11 @@ export const create = mutation({
     imageUrl: v.string(),
     categoryId: v.id("categories"),
     slug: v.string(),
+    usos: v.optional(v.string()),
+    preparacion: v.optional(v.string()),
+    actividad: v.optional(v.string()),
+    medidas: v.optional(v.string()),
+    fotosDeEjemplos: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -87,6 +128,11 @@ export const create = mutation({
       imageUrl: args.imageUrl,
       categoryId: args.categoryId,
       slug: args.slug,
+      usos: args.usos,
+      preparacion: args.preparacion,
+      actividad: args.actividad,
+      medidas: args.medidas,
+      fotosDeEjemplos: args.fotosDeEjemplos,
     };
     const id = await ctx.db.insert("products", newProduct);
     return { id };
@@ -100,6 +146,11 @@ export const update = mutation({
     imageUrl: v.optional(v.string()),
     categoryId: v.optional(v.id("categories")),
     slug: v.optional(v.string()),
+    usos: v.optional(v.string()),
+    preparacion: v.optional(v.string()),
+    actividad: v.optional(v.string()),
+    medidas: v.optional(v.string()),
+    fotosDeEjemplos: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;

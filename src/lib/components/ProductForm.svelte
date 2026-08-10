@@ -43,6 +43,11 @@
         slug: "",
         categoryId: "",
         imageUrl: "",
+        usos: "",
+        preparacion: "",
+        actividad: "",
+        medidas: "",
+        fotosDeEjemplos: [],
     };
 
     // Configuración de Superforms
@@ -104,6 +109,7 @@
                     ...f.data,
                     imageUrl: finalImageUrl,
                     slug: finalSlug,
+                    fotosDeEjemplos: f.data.fotosDeEjemplos || [],
                 });
             } finally {
                 isSubmitting = false;
@@ -118,6 +124,8 @@
     let imagePreview = $state<string | null>(null);
     let isUploading = $state(false);
     let isSubmitting = $state(false);
+    let examplePhotoFiles = $state<File[]>([]);
+    let examplePhotoPreviews = $state<string[]>([]);
 
     // Sincronización limpia cuando cambie la prop 'product'
     $effect(() => {
@@ -127,10 +135,17 @@
                 slug: product?.slug ?? "",
                 categoryId: product?.categoryId ?? "",
                 imageUrl: product?.imageUrl ?? "",
+                usos: product?.usos ?? "",
+                preparacion: product?.preparacion ?? "",
+                actividad: product?.actividad ?? "",
+                medidas: product?.medidas ?? "",
+                fotosDeEjemplos: product?.fotosDeEjemplos ?? [],
             },
         });
         imagePreview = product?.imageUrl ?? null;
         imageFile = null;
+        examplePhotoFiles = [];
+        examplePhotoPreviews = [];
     });
 
     // Labels seleccionados para los Selects de shadcn
@@ -158,6 +173,49 @@
         imageFile = null;
         imagePreview = null;
         $formData.imageUrl = "";
+    }
+
+    async function handleExamplePhotoChange(e: Event) {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+            try {
+                isUploading = true;
+                const optimizedImage = await optimizeImage(file, {
+                    maxWidth: 800,
+                    quality: 0.8,
+                    format: "webp",
+                });
+
+                const uploadUrl = await generateUploadUrl({});
+                const response = await fetch(uploadUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": optimizedImage.type,
+                    },
+                    body: optimizedImage,
+                });
+
+                if (!response.ok)
+                    throw new Error("Error al subir la foto de ejemplo");
+
+                const { storageId } = await response.json();
+                
+                // Add to the fotosDeEjemplos array
+                if (!$formData.fotosDeEjemplos) {
+                    $formData.fotosDeEjemplos = [];
+                }
+                $formData.fotosDeEjemplos = [...$formData.fotosDeEjemplos, storageId];
+                toast.success("Foto de ejemplo subida correctamente");
+            } catch (err) {
+                toast.error("Error al procesar la foto de ejemplo");
+                console.error(err);
+            } finally {
+                isUploading = false;
+            }
+        }
+        // Reset the input
+        target.value = "";
     }
 </script>
 
@@ -266,6 +324,105 @@
         {#if $errors.imageUrl}
             <p class="text-sm text-destructive">{$errors.imageUrl}</p>
         {/if}
+    </div>
+
+    <!-- Ficha Técnica -->
+    <div class="space-y-4 pt-4 border-t border-border">
+        <h3 class="text-sm font-semibold text-foreground">Ficha Técnica</h3>
+        
+        <!-- Usos -->
+        <div class="space-y-2">
+            <Label for="usos">Usos</Label>
+            <Textarea
+                id="usos"
+                bind:value={$formData.usos}
+                placeholder="Describe los usos del producto..."
+                rows={3}
+            />
+        </div>
+
+        <!-- Preparación -->
+        <div class="space-y-2">
+            <Label for="preparacion">Preparación</Label>
+            <Textarea
+                id="preparacion"
+                bind:value={$formData.preparacion}
+                placeholder="Instrucciones de preparación..."
+                rows={3}
+            />
+        </div>
+
+        <!-- Actividad -->
+        <div class="space-y-2">
+            <Label for="actividad">Actividad</Label>
+            <Textarea
+                id="actividad"
+                bind:value={$formData.actividad}
+                placeholder="Describe la actividad o aplicación..."
+                rows={3}
+            />
+        </div>
+
+        <!-- Medidas -->
+        <div class="space-y-2">
+            <Label for="medidas">Medidas</Label>
+            <Textarea
+                id="medidas"
+                bind:value={$formData.medidas}
+                placeholder="Dimensiones, capacidades, etc..."
+                rows={2}
+            />
+        </div>
+
+        <!-- Fotos de Ejemplos -->
+        <div class="space-y-2">
+            <Label>Fotos de Ejemplos</Label>
+            <div class="space-y-2">
+                {#if $formData.fotosDeEjemplos && $formData.fotosDeEjemplos.length > 0}
+                    <div class="grid grid-cols-3 gap-2">
+                        {#each $formData.fotosDeEjemplos as photoUrl, index}
+                            <div class="relative aspect-square rounded-lg overflow-hidden bg-muted border border-border">
+                                <img
+                                    src={photoUrl}
+                                    alt="Foto de ejemplo {index + 1}"
+                                    class="w-full h-full object-cover"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="icon"
+                                    onclick={() => {
+                                        $formData.fotosDeEjemplos = $formData.fotosDeEjemplos.filter((_, i) => i !== index);
+                                    }}
+                                    class="absolute top-1 right-1 h-6 w-6"
+                                >
+                                    <X size={12} />
+                                </Button>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+                
+                <div
+                    class="border-2 border-dashed border-border rounded-lg p-4 transition-colors hover:border-muted-foreground/50"
+                >
+                    <label
+                        for="example-photos-upload"
+                        class="flex flex-col items-center justify-center cursor-pointer"
+                    >
+                        <Plus size={24} class="text-muted-foreground mb-1" />
+                        <span class="text-xs text-muted-foreground">Agregar foto de ejemplo</span>
+                    </label>
+                    <input
+                        id="example-photos-upload"
+                        type="file"
+                        accept="image/*"
+                        onchange={handleExamplePhotoChange}
+                        class="hidden"
+                    />
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Botones de Acción -->

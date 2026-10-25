@@ -26,6 +26,6 @@
     <SolarEnergy />
     <CoreValues />
     <Cta />
-    <Advisors />
+    <!-- <Advisors /> -->
     <Footer />
 </div>

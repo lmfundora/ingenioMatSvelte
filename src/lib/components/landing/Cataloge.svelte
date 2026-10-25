@@ -8,7 +8,7 @@
             id: "materiales",
             title: "Materiales de Construcción",
             desc: "Bases sólidas, áridos y acero certificado para todo tipo de cimientos y estructuras.",
-            img: "/saco1.png",
+            img: "/saco1.webp",
             items: [
                 "Cemento Gris de Alta Resistencia",
                 "Arena Lavada y Gravilla Seleccionada",
@@ -20,7 +20,7 @@
             id: "energia",
             title: "Energía Solar y Almacenamiento",
             desc: "Autonomía energética total con paneles solares monocristalinos y bancos de baterías de litio.",
-            img: "/solar_battery.png",
+            img: "/solar_battery.webp",
             items: [
                 "Paneles Solares Monocristalinos de Alta Gama",
                 "Baterías de Litio LiFePO4 para Respaldo",
@@ -32,7 +32,7 @@
             id: "carpinteria",
             title: "Carpintería de Aluminio",
             desc: "Cerramientos de alta precisión, ventanas y puertas diseñadas para el máximo confort acústico y térmico.",
-            img: "/carpinteria_aluminio.png",
+            img: "/carpinteria_aluminio.webp",
             items: [
                 "Ventanas Batientes y Corredizas a Medida",
                 "Mamparas de Vidrio Templado Premium",

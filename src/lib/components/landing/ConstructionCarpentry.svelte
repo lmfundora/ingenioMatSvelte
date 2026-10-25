@@ -57,7 +57,7 @@
                 <!-- Image frame -->
                 <div class="h-64 relative overflow-hidden rounded-t-3xl">
                     <img
-                        src="/dream_house_2.png"
+                        src="/dream_house_2.webp"
                         alt="Construcción civil y obras"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
@@ -127,7 +127,7 @@
                 <!-- Image frame -->
                 <div class="h-64 relative overflow-hidden rounded-t-3xl">
                     <img
-                        src="/carpinteria_aluminio.png"
+                        src="/carpinteria_aluminio.webp"
                         alt="Carpintería de aluminio premium"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />

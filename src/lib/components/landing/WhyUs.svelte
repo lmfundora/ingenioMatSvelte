@@ -47,7 +47,7 @@
                     class="relative overflow-hidden rounded-2xl border border-border aspect-4/3 bg-muted group"
                 >
                     <img
-                        src="/Gemini_Generated_Image_3d90v23d90v23d902.png"
+                        src="/Gemini_Generated_Image_3d90v23d90v23d902.webp"
                         alt="Producción y stock de materiales de construcción"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />

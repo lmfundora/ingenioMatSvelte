@@ -44,7 +44,7 @@
                         class="col-span-6 md:col-span-6 row-span-2 overflow-hidden rounded-2xl border border-border relative group transition-all duration-500 hover:shadow-2xl hover:border-primary/50 bg-muted"
                     >
                         <img
-                            src="/solar_battery.png"
+                            src="/solar_battery.webp"
                             alt="Instalación de Paneles Solares y Baterías"
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
@@ -69,7 +69,7 @@
                         class="col-span-6 md:col-span-6 row-span-1 overflow-hidden rounded-2xl border border-border relative group transition-all duration-500 hover:shadow-2xl hover:border-primary/50 bg-muted"
                     >
                         <img
-                            src="/carpinteria_aluminio.png"
+                            src="/carpinteria_aluminio.webp"
                             alt="Carpintería de aluminio de alta gama"
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
@@ -94,7 +94,7 @@
                         class="col-span-6 md:col-span-6 row-span-1 overflow-hidden rounded-2xl border border-border relative group transition-all duration-500 hover:shadow-2xl hover:border-primary/50 bg-muted"
                     >
                         <img
-                            src="/dream_house_3.png"
+                            src="/dream_house_3.webp"
                             alt="Construcción civil y remodelación"
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />

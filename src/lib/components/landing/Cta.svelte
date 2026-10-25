@@ -54,7 +54,7 @@
                             <Button
                                 size="lg"
                                 variant="outline"
-                                class="w-full sm:w-auto h-12 px-8 font-semibold border-white/20 text-white hover:bg-white/10 hover:text-white"
+                                class="w-full sm:w-auto h-12 px-8 font-semibold border-white/20 text-black hover:bg-white/10 hover:text-white"
                             >
                                 Catálogo General
                             </Button>
@@ -68,7 +68,7 @@
                         class="overflow-hidden rounded-2xl border border-white/15 aspect-[1.3] bg-muted transform translate-y-8 translate-x-4"
                     >
                         <img
-                            src="/images1.png"
+                            src="/images1.webp"
                             alt="Servicio y atencion en Ingeniomat"
                             class="w-full h-full object-cover"
                         />

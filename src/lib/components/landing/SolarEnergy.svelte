@@ -49,7 +49,7 @@
                     class="relative overflow-hidden rounded-3xl border border-border bg-muted group"
                 >
                     <img
-                        src="/solar_battery.png"
+                        src="/solar_battery.webp"
                         alt="Instalación Solar con Respaldo de Baterías"
                         class="w-full h-48 sm:h-64 object-cover transition-transform duration-700 group-hover:scale-105"
                     />

@@ -33,7 +33,6 @@
             <a href="#inicio" class="text-primary">Inicio</a>
             <a href="#catalogo" class="text-primary">Materiales</a>
             <a href="#construccion" class="text-primary">Construcción</a>
-            <a href="#contacto" class="text-primary">Contacto</a>
         </nav>
 
         <!-- CTA Button -->

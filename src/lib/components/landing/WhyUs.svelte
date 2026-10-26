@@ -76,14 +76,6 @@
                     </div>
                 {/each}
 
-                <div class="pt-2">
-                    <Button
-                        size="lg"
-                        class="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold px-8 ms-11 hover:scale-[1.02] transition-all duration-300 cursor-default"
-                    >
-                        Descargar Fichas Técnicas
-                    </Button>
-                </div>
             </div>
         </div>
     </div>

@@ -45,7 +45,9 @@
                     >
                         <img
                             src="/solar_battery.webp"
-                            alt="Instalación de Paneles Solares y Baterías"
+                            alt="Sistema de energía solar con baterías de litio para autonomía energética en hogares y empresas"
+                            width="800"
+                            height="600"
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div
@@ -70,7 +72,9 @@
                     >
                         <img
                             src="/carpinteria_aluminio.webp"
-                            alt="Carpintería de aluminio de alta gama"
+                            alt="Carpintería de aluminio de alta gama con acabados a medida para ventanas y cerramientos"
+                            width="800"
+                            height="400"
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div
@@ -95,7 +99,9 @@
                     >
                         <img
                             src="/dream_house_3.webp"
-                            alt="Construcción civil y remodelación"
+                            alt="Proyectos de construcción civil llave en mano: obras nuevas, remodelaciones y edificación profesional"
+                            width="800"
+                            height="400"
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div

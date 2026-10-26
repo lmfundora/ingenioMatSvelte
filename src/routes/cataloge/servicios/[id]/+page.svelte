@@ -3,7 +3,6 @@
     import { Badge } from "$lib/components/ui/badge/index.js";
     import {
         Wrench,
-        ArrowLeft,
         ShieldCheck,
         Clock,
         DollarSign,
@@ -11,26 +10,49 @@
         ClipboardList,
         Image as ImageIcon,
     } from "@lucide/svelte";
+    import SEOMetaTags from "$lib/components/SEOMetaTags.svelte";
+    import StructuredData from "$lib/components/StructuredData.svelte";
 
     let { data }: { data: PageData } = $props();
     let service = $derived(data.service);
     let serviceType = $derived(data.serviceType);
+
+    // Generar descripción dinámica para SEO
+    let seoDescription = $derived(
+        `${service.name} ${serviceType ? `- ${serviceType.name}` : ''}. ${service.description || 'Servicio profesional de alta calidad.'} ${service.detalles ? service.detalles : ''} ${service.areaDeCobertura ? `Área de cobertura: ${service.areaDeCobertura}.` : ''} IngenioMat - Servicios especializados.`
+    );
 </script>
 
 <svelte:head>
-    <title>{service.name} | Servicios</title>
-    <meta name="description" content="Detalles de {service.name}" />
+    <SEOMetaTags
+        title={`${service.name} | IngenioMat Servicios`}
+        description={seoDescription}
+        image={service.imageUrl || '/dream_house_3.webp'}
+        type="article"
+        keywords={`${service.name}, ${serviceType?.name || ''}, servicios, ${service.description || ''}, ${service.areaDeCobertura || ''}`}
+    />
+    <StructuredData
+        schema={{
+            '@context': 'https://schema.org',
+            '@type': 'Service',
+            name: service.name,
+            description: seoDescription,
+            image: service.imageUrl,
+            provider: {
+                '@type': 'Organization',
+                name: 'IngenioMat',
+                url: 'https://tu-dominio.com'
+            },
+            areaServed: service.areaDeCobertura,
+            offers: {
+                '@type': 'Offer',
+                price: service.precioBase,
+                priceCurrency: 'EUR',
+                availability: 'https://schema.org/InStock'
+            }
+        }}
+    />
 </svelte:head>
-
-<div class="mb-6">
-    <a
-        href="/cataloge/servicios"
-        class="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
-    >
-        <ArrowLeft size={16} class="mr-2" />
-        Volver a servicios
-    </a>
-</div>
 
 <div class="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
@@ -41,7 +63,10 @@
             {#if service.imageUrl}
                 <img
                     src={service.imageUrl}
-                    alt={service.name}
+                    alt={`${service.name} - ${serviceType?.name || 'Servicio profesional'}`}
+                    width="800"
+                    height="800"
+                    loading="eager"
                     class="max-w-full max-h-full object-contain drop-shadow-md rounded-lg"
                 />
             {:else}
@@ -173,7 +198,10 @@
                                 >
                                     <img
                                         src={exampleUrl}
-                                        alt="Ejemplo de trabajo"
+                                        alt={`Ejemplo de trabajo realizado: ${service.name}`}
+                                        width="400"
+                                        height="400"
+                                        loading="lazy"
                                         class="w-full h-full object-cover hover:scale-105 transition-transform"
                                     />
                                 </div>

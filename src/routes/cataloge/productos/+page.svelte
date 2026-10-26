@@ -3,6 +3,7 @@
     import { ChevronRight, Home, Package } from "@lucide/svelte";
     import ProductCardCustomer from "$lib/components/ProductCardCustomer.svelte";
     import SearchAndFilters from "$lib/components/SearchAndFilters.svelte";
+    import SEOMetaTags from "$lib/components/SEOMetaTags.svelte";
     import type { Doc, Id } from "$convex/_generated/dataModel";
 
     interface PageData {
@@ -19,12 +20,12 @@
     // Productos filtrados
     let filteredProducts = $derived.by(() => {
         if (!data.products) return [];
-        
+
         return data.products.filter((product: Doc<"products">) => {
-            const matchesSearch = searchQuery === "" || 
+            const matchesSearch = searchQuery === "" ||
                 product.name.toLowerCase().includes(searchQuery.toLowerCase());
-            
-            const matchesCategory = filterCategory === "" || 
+
+            const matchesCategory = filterCategory === "" ||
                 product.categoryId === filterCategory;
 
             return matchesSearch && matchesCategory;
@@ -54,10 +55,12 @@
 </script>
 
 <svelte:head>
-    <title>Productos | Catálogo</title>
-    <meta
-        name="description"
-        content="Explora nuestro catálogo completo de productos: materiales de construcción, equipos de energía solar y perfilería de aluminio."
+    <SEOMetaTags
+        title="Productos | Catálogo IngenioMat"
+        description="Explora nuestro catálogo completo de productos: materiales de construcción certificados, equipos de energía solar, baterías de litio y perfilería de aluminio de alta calidad."
+        image="/dream_house_3.webp"
+        keywords="productos construcción, materiales construcción, paneles solares, baterías litio, perfilería aluminio, suministro materiales"
+        canonical="https://tu-dominio.com/cataloge/productos"
     />
 </svelte:head>
 

@@ -1,27 +1,45 @@
 <script lang="ts">
     import type { PageData } from "./$types";
     import { Badge } from "$lib/components/ui/badge/index.js";
-    import { Package, ArrowLeft, ShieldCheck, Truck } from "@lucide/svelte";
+    import { Package, ShieldCheck, Truck } from "@lucide/svelte";
+    import SEOMetaTags from "$lib/components/SEOMetaTags.svelte";
+    import StructuredData from "$lib/components/StructuredData.svelte";
 
     let { data }: { data: PageData } = $props();
     let product = $derived(data.product);
     let category = $derived(data.category);
+
+    // Generar descripción dinámica para SEO
+    let seoDescription = $derived(
+        `${product.name} ${category ? `- ${category.name}` : ''}. ${product.usos || 'Producto de alta calidad para construcción.'} ${product.medidas ? `Medidas: ${product.medidas}.` : ''} IngenioMat - Materiales de construcción certificados.`
+    );
 </script>
 
 <svelte:head>
-    <title>{product.name} | Catálogo</title>
-    <meta name="description" content="Detalles de {product.name}" />
+    <SEOMetaTags
+        title={`${product.name} | IngenioMat Catálogo`}
+        description={seoDescription}
+        image={product.imageUrl || '/dream_house_3.webp'}
+        type="product"
+        keywords={`${product.name}, ${category?.name || ''}, materiales de construcción, ${product.usos || ''}`}
+    />
+    <StructuredData
+        schema={{
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.name,
+            description: seoDescription,
+            image: product.imageUrl,
+            category: category?.name,
+            offers: {
+                '@type': 'Offer',
+                availability: 'https://schema.org/InStock',
+                priceCurrency: 'EUR',
+                url: `https://tu-dominio.com/cataloge/productos/${product.slug}`
+            }
+        }}
+    />
 </svelte:head>
-
-<div class="mb-6">
-    <a
-        href="/cataloge/productos"
-        class="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
-    >
-        <ArrowLeft size={16} class="mr-2" />
-        Volver a productos
-    </a>
-</div>
 
 <div class="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
@@ -32,7 +50,10 @@
             {#if product.imageUrl}
                 <img
                     src={product.imageUrl}
-                    alt={product.name}
+                    alt={`${product.name} - ${category?.name || 'Producto de construcción'}`}
+                    width="800"
+                    height="800"
+                    loading="eager"
                     class="max-w-full max-h-full object-contain drop-shadow-md rounded-lg"
                 />
             {:else}
@@ -138,7 +159,10 @@
                                 >
                                     <img
                                         src={photoUrl}
-                                        alt="Foto de ejemplo"
+                                        alt={`Ejemplo de aplicación de ${product.name}`}
+                                        width="400"
+                                        height="400"
+                                        loading="lazy"
                                         class="w-full h-full object-cover"
                                     />
                                 </div>

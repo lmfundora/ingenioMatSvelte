@@ -3,6 +3,7 @@
     import { Wrench } from "@lucide/svelte";
     import ServiceCardCustomer from "$lib/components/ServiceCardCustomer.svelte";
     import SearchAndFilters from "$lib/components/SearchAndFilters.svelte";
+    import SEOMetaTags from "$lib/components/SEOMetaTags.svelte";
     import type { Doc, Id } from "$convex/_generated/dataModel";
 
     interface PageData {
@@ -65,10 +66,12 @@
 </script>
 
 <svelte:head>
-    <title>Servicios | Catálogo</title>
-    <meta
-        name="description"
-        content="Explora nuestro catálogo de servicios especializados, instalación y mano de obra."
+    <SEOMetaTags
+        title="Servicios | Catálogo IngenioMat"
+        description="Explora nuestro catálogo de servicios especializados: instalaciones solares llave en mano, fabricación e instalación de ventanas y cerramientos de aluminio a medida, y mano de obra profesional."
+        image="/dream_house_3.webp"
+        keywords="servicios construcción, instalación solar, carpintería aluminio, ventanas aluminio, mano de obra, proyectos llave en mano"
+        canonical="https://tu-dominio.com/cataloge/servicios"
     />
 </svelte:head>
 

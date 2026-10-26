@@ -2,15 +2,23 @@
     import { ChevronRight, Package, Wrench } from "@lucide/svelte";
 
     import Footer from "$lib/components/landing/Footer.svelte";
+    import SEOMetaTags from "$lib/components/SEOMetaTags.svelte";
+    import BackButton from "$lib/components/BackButton.svelte";
 </script>
 
 <svelte:head>
-    <title>Catálogo | Productos y Servicios Especializados</title>
-    <meta
-        name="description"
-        content="Explora nuestro catálogo completo de materiales de construcción, equipos de energía solar y servicios de carpintería de aluminio e instalación."
+    <SEOMetaTags
+        title="Catálogo | Productos y Servicios Especializados"
+        description="Explora nuestro catálogo completo de materiales de construcción, equipos de energía solar y servicios de carpintería de aluminio e instalación. Suministro directo y mano de obra profesional."
+        image="/dream_house_3.webp"
+        keywords="catálogo productos, catálogo servicios, materiales construcción, energía solar, carpintería aluminio, instalación solar"
+        canonical="https://tu-dominio.com/cataloge"
     />
 </svelte:head>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+    <BackButton href="/" />
+</div>
 
 <section
     id="catalogo-selector"
